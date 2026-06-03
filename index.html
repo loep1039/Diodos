@@ -1,0 +1,233 @@
+import React, { useState } from 'react';
+import { Activity, Zap, Info, Settings2 } from 'lucide-react';
+
+export default function App() {
+  const [voltage, setVoltage] = useState(5);
+
+  // Lógica física del circuito
+  const resistance = 1000; // 1k Ohm
+  const diodeThreshold = 0.7; // 0.7V umbral típico del silicio
+  
+  let current_mA = 0;
+  let diodeVoltage = 0;
+  let status = "";
+  let statusColor = "";
+
+  if (voltage > diodeThreshold) {
+    // Polarización Directa (Conducción)
+    diodeVoltage = diodeThreshold;
+    current_mA = ((voltage - diodeThreshold) / resistance) * 1000; // I = V/R, convertido a mA
+    status = "Conducción (Polarización Directa)";
+    statusColor = "text-emerald-600 bg-emerald-100 border-emerald-300";
+  } else if (voltage >= 0 && voltage <= diodeThreshold) {
+    // Voltaje positivo pero insuficiente para superar la barrera
+    diodeVoltage = voltage;
+    current_mA = 0;
+    status = "Corte (Voltaje insuficiente)";
+    statusColor = "text-yellow-600 bg-yellow-100 border-yellow-300";
+  } else {
+    // Polarización Inversa (Bloqueo)
+    diodeVoltage = voltage;
+    current_mA = 0;
+    status = "Bloqueo (Polarización Inversa)";
+    statusColor = "text-red-600 bg-red-100 border-red-300";
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-100 p-4 md:p-8 font-sans text-slate-800">
+      <div className="max-w-5xl mx-auto space-y-6">
+        
+        {/* Encabezado */}
+        <header className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+          <div className="p-3 bg-blue-100 text-blue-600 rounded-lg">
+            <Activity size={32} />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Simulador de Circuito DC</h1>
+            <p className="text-slate-500">Análisis de Diodo 1N4001 con Resistencia de Carga (1kΩ)</p>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Panel Izquierdo: Controles y Lecturas */}
+          <div className="space-y-6">
+            
+            {/* Controles de la Fuente */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+              <div className="flex items-center space-x-2 mb-4">
+                <Settings2 className="text-slate-400" />
+                <h2 className="text-lg font-semibold">Fuente de Alimentación</h2>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-600 mb-2">
+                    Voltaje de la Fuente (Vs): <span className="font-bold text-blue-600">{voltage.toFixed(1)} V</span>
+                  </label>
+                  <input 
+                    type="range" 
+                    min="-10" 
+                    max="10" 
+                    step="0.1" 
+                    value={voltage} 
+                    onChange={(e) => setVoltage(parseFloat(e.target.value))}
+                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                  />
+                  <div className="flex justify-between text-xs text-slate-400 mt-2">
+                    <span>-10V (Inversa)</span>
+                    <span>0V</span>
+                    <span>+10V (Directa)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Instrumentos Virtuales */}
+            <div className="bg-slate-900 text-white p-6 rounded-xl shadow-lg border-4 border-slate-700">
+              <h2 className="text-sm uppercase tracking-wider text-slate-400 mb-4 font-semibold">Instrumentos Virtuales</h2>
+              
+              <div className="space-y-4">
+                <div className="bg-black/50 p-4 rounded-lg border border-slate-700">
+                  <div className="text-xs text-slate-400 mb-1">Amperímetro DC (Corriente del Circuito)</div>
+                  <div className="text-3xl font-mono text-emerald-400 flex items-center justify-between">
+                    <span>{current_mA.toFixed(2)}</span>
+                    <span className="text-xl">mA</span>
+                  </div>
+                </div>
+
+                <div className="bg-black/50 p-4 rounded-lg border border-slate-700">
+                  <div className="text-xs text-slate-400 mb-1">Voltímetro DC (Voltaje en el Diodo)</div>
+                  <div className="text-3xl font-mono text-blue-400 flex items-center justify-between">
+                    <span>{Math.abs(diodeVoltage).toFixed(2)}</span>
+                    <span className="text-xl">V</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Panel Derecho: Diagrama del Circuito */}
+          <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold flex items-center space-x-2">
+                <Zap className="text-yellow-500" size={20} />
+                <span>Esquema del Circuito</span>
+              </h2>
+              <div className={`px-4 py-1.5 rounded-full border text-sm font-semibold transition-colors duration-300 ${statusColor}`}>
+                {status}
+              </div>
+            </div>
+
+            {/* Lienzo SVG del Circuito */}
+            <div className="flex-1 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl relative flex items-center justify-center p-4 overflow-hidden min-h-[350px]">
+              <svg viewBox="0 0 800 500" className="w-full h-full max-w-2xl drop-shadow-sm">
+                <defs>
+                  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#ef4444" />
+                  </marker>
+                </defs>
+
+                {/* Cables principales */}
+                <path d="M 150 150 L 650 150 L 650 350 L 150 350 Z" fill="none" stroke="#64748b" strokeWidth="4" />
+
+                {/* Fuente de Voltaje (Batería) */}
+                <g transform="translate(150, 250)">
+                  <rect x="-30" y="-40" width="60" height="80" fill="#cbd5e1" stroke="#475569" strokeWidth="3" rx="4" />
+                  <line x1="-40" y1="0" x2="-30" y2="0" stroke="#64748b" strokeWidth="4" />
+                  <line x1="30" y1="0" x2="40" y2="0" stroke="#64748b" strokeWidth="4" />
+                  <circle cx="0" cy="0" r="25" fill="white" stroke="#3b82f6" strokeWidth="3" />
+                  <text x="0" y="6" fontFamily="monospace" fontSize="18" textAnchor="middle" fill="#1e293b" fontWeight="bold">Vs</text>
+                  
+                  {/* Indicadores de polaridad dinámicos */}
+                  <text x="0" y="-55" fontSize="24" textAnchor="middle" fill={voltage >= 0 ? "#ef4444" : "#3b82f6"} fontWeight="bold">
+                    {voltage >= 0 ? "+" : "-"}
+                  </text>
+                  <text x="0" y="70" fontSize="24" textAnchor="middle" fill={voltage >= 0 ? "#3b82f6" : "#ef4444"} fontWeight="bold">
+                    {voltage >= 0 ? "-" : "+"}
+                  </text>
+                </g>
+
+                {/* Amperímetro */}
+                <g transform="translate(300, 150)">
+                  <circle cx="0" cy="0" r="25" fill="white" stroke="#10b981" strokeWidth="4" />
+                  <text x="0" y="8" fontFamily="sans-serif" fontSize="22" textAnchor="middle" fill="#10b981" fontWeight="bold">A</text>
+                </g>
+
+                {/* Diodo 1N4001 */}
+                <g transform="translate(500, 150)">
+                  {/* Triángulo (Ánodo) */}
+                  <polygon points="-20,-20 20,0 -20,20" fill={current_mA > 0 ? "#ef4444" : "#1e293b"} className="transition-colors duration-300" />
+                  {/* Línea (Cátodo) */}
+                  <line x1="20" y1="-20" x2="20" y2="20" stroke={current_mA > 0 ? "#ef4444" : "#1e293b"} strokeWidth="5" className="transition-colors duration-300" />
+                  <text x="0" y="-35" fontSize="16" textAnchor="middle" fill="#475569" fontWeight="bold">1N4001</text>
+                  <text x="-25" y="25" fontSize="18" textAnchor="middle" fill="#ef4444" fontWeight="bold">+</text>
+                  <text x="30" y="25" fontSize="18" textAnchor="middle" fill="#3b82f6" fontWeight="bold">-</text>
+                </g>
+
+                {/* Resistencia de Carga */}
+                <g transform="translate(650, 250)">
+                  <rect x="-15" y="-30" width="30" height="60" fill="#f8fafc" stroke="#1e293b" strokeWidth="3" />
+                  <text x="40" y="6" fontSize="16" textAnchor="middle" fill="#475569" fontWeight="bold">1kΩ</text>
+                  <text x="40" y="-15" fontSize="14" textAnchor="middle" fill="#64748b">Carga</text>
+                </g>
+
+                {/* Voltímetro (en paralelo al diodo) */}
+                <g transform="translate(500, 50)">
+                  <line x1="-30" y1="100" x2="-30" y2="0" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4" />
+                  <line x1="30" y1="100" x2="30" y2="0" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4" />
+                  <line x1="-30" y1="0" x2="-20" y2="0" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4" />
+                  <line x1="30" y1="0" x2="20" y2="0" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4" />
+                  <circle cx="0" cy="0" r="20" fill="white" stroke="#3b82f6" strokeWidth="3" />
+                  <text x="0" y="6" fontFamily="sans-serif" fontSize="18" textAnchor="middle" fill="#3b82f6" fontWeight="bold">V</text>
+                </g>
+
+                {/* Animación de Corriente Convencional Fluyendo */}
+                {current_mA > 0 && (
+                  <g>
+                    {/* Línea punteada animada que recorre el circuito */}
+                    <path 
+                      d="M 150 210 L 150 150 L 650 150 L 650 350 L 150 350 L 150 290" 
+                      fill="none" 
+                      stroke="#ef4444" 
+                      strokeWidth="6" 
+                      strokeDasharray="12 12"
+                      strokeLinecap="round"
+                    >
+                      <animate 
+                        attributeName="stroke-dashoffset" 
+                        from="24" 
+                        to="0" 
+                        dur={`${Math.max(0.2, 1.2 - (voltage / 10))}s`} 
+                        repeatCount="indefinite" 
+                      />
+                    </path>
+                    <text x="400" y="130" fontSize="15" fill="#ef4444" textAnchor="middle" fontWeight="bold">
+                      Flujo de Corriente
+                    </text>
+                  </g>
+                )}
+
+                {/* Indicador de bloqueo (Cruz roja) */}
+                {voltage < 0 && (
+                  <g transform="translate(500, 150)">
+                    <line x1="-15" y1="-15" x2="15" y2="15" stroke="#ef4444" strokeWidth="6" />
+                    <line x1="-15" y1="15" x2="15" y2="-15" stroke="#ef4444" strokeWidth="6" />
+                  </g>
+                )}
+              </svg>
+            </div>
+            
+            <div className="mt-4 p-4 bg-blue-50 text-blue-800 rounded-lg flex items-start space-x-3 text-sm">
+              <Info className="flex-shrink-0 mt-0.5" size={18} />
+              <p>
+                <strong>¿Qué está pasando?</strong> Mueve el control deslizante. Cuando el voltaje es mayor a <strong>~0.7V</strong>, el diodo se "abre" (Polarización Directa) y la corriente fluye, marcando un valor en el Amperímetro. Si bajas el voltaje a valores negativos, el diodo se comporta como un aislante (Polarización Inversa), la corriente cae a 0 mA, y el Voltímetro muestra todo el voltaje retenido por la barrera del componente.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
