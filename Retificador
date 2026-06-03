@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Fuente de Alimentación DC - Transformador + Puente Rectificador + Bombilla | Simulador AC a DC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .waveform {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        .led-glow {
+            box-shadow: 0 0 15px rgba(255, 200, 50, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 min-h-screen p-4 md:p-6 font-sans">
+
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-900 to-slate-800 rounded-2xl shadow-xl p-5 mb-6 border border-blue-700">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
+                        <span class="text-4xl">🔌</span> 
+                        Fuente de Alimentación DC
+                    </h1>
+                    <p class="text-blue-200 text-sm mt-1">Transformador 120V AC → 12V AC → Puente rectificador (4 diodos) → Filtro capacitivo → Bombilla DC</p>
+                </div>
+                <div class="bg-slate-900/50 backdrop-blur px-4 py-2 rounded-lg border border-blue-500/50">
+                    <span class="text-blue-300 text-xs">⚡ Circuito real de electrónica de potencia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Panel Izquierdo: Controles y parámetros -->
+            <div class="space-y-5">
+                
+                <!-- Controles de carga -->
+                <div class="bg-slate-800 rounded-xl shadow-lg p-5 border border-slate-700">
+                    <h2 class="text-white font-semibold mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 14h-2v-2h2v2zm0-4h-2V6h2v6z"/></svg>
+                        Parámetros de la Carga
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-slate-300 text-sm block mb-2">💡 Potencia de la bombilla (watts)</label>
+                            <input type="range" id="potenciaBombilla" min="1" max="60" step="1" value="12" class="w-full accent-yellow-500">
+                            <div class="flex justify-between text-xs text-slate-400 mt-1">
+                                <span>1W (baja)</span>
+                                <span id="potenciaValor" class="text-yellow-400 font-bold">12 W</span>
+                                <span>60W (brillante)</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="text-slate-300 text-sm block mb-2">🔧 Capacitor de filtro (μF)</label>
+                            <input type="range" id="capacitorValor" min="100" max="4700" step="50" value="2200" class="w-full accent-cyan-500">
+                            <div class="flex justify-between text-xs text-slate-400 mt-1">
+                                <span>100μF (más rizado)</span>
+                                <span id="capMostrar" class="text-cyan-400 font-bold">2200 μF</span>
+                                <span>4700μF (filtro suave)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Instrumentos de medición -->
+                <div class="bg-slate-800 rounded-xl shadow-lg p-5 border border-slate-700">
+                    <h2 class="text-white font-semibold mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M8 12h8"/></svg>
+                        Mediciones en Tiempo Real
+                    </h2>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-black/40 rounded-lg p-3 border border-slate-600">
+                            <div class="text-xs text-slate-400">V entrada AC (primario)</div>
+                            <div class="text-xl font-mono text-blue-400 font-bold" id="vPrimario">120 V</div>
+                            <div class="text-xs text-slate-500">RMS</div>
+                        </div>
+                        <div class="bg-black/40 rounded-lg p-3 border border-slate-600">
+                            <div class="text-xs text-slate-400">V secundario AC</div>
+                            <div class="text-xl font-mono text-indigo-400 font-bold" id="vSecundarioAC">12.0 V</div>
+                            <div class="text-xs text-slate-500">RMS</div>
+                        </div>
+                        <div class="bg-black/40 rounded-lg p-3 border border-slate-600">
+                            <div class="text-xs text-slate-400">V salida DC (pico)</div>
+                            <div class="text-xl font-mono text-green-400 font-bold" id="vSalidaDC">0 V</div>
+                            <div class="text-xs text-slate-500">con filtro</div>
+                        </div>
+                        <div class="bg-black/40 rounded-lg p-3 border border-slate-600">
+                            <div class="text-xs text-slate-400">Corriente por bombilla</div>
+                            <div class="text-xl font-mono text-yellow-400 font-bold" id="corrienteDC">0 A</div>
+                            <div class="text-xs text-slate-500">I = V / R</div>
+                        </div>
+                        <div class="bg-black/40 rounded-lg p-3 border border-slate-600 col-span-2">
+                            <div class="text-xs text-slate-400">Rizado (Vpp aproximado)</div>
+                            <div class="text-lg font-mono text-red-400 font-bold" id="rizadoValor">0 mV</div>
+                            <div class="text-xs text-slate-500">Vr = I/(2fC)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Info de los diodos en puente -->
+                <div class="bg-slate-800 rounded-xl shadow-lg p-4 border border-slate-700">
+                    <div class="flex gap-3 items-start">
+                        <div class="bg-blue-900/50 p-2 rounded-lg">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 12h18M12 3v18"/><path d="M7 7l10 10M17 7L7 17"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-white text-sm font-semibold">Puente rectificador de 4 diodos (1N4007)</h3>
+                            <p class="text-slate-400 text-xs mt-1">Los diodos conmutan el ciclo positivo y negativo de la AC, convirtiéndola en pulsante. Luego el capacitor alisa la señal para alimentar la bombilla DC.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Panel Derecho: Diagrama y formas de onda -->
+            <div class="lg:col-span-2 space-y-5">
+                
+                <!-- Diagrama del circuito -->
+                <div class="bg-slate-800 rounded-xl shadow-lg p-4 border border-slate-700">
+                    <h2 class="text-white text-md font-semibold mb-3 flex items-center gap-2">
+                        <span>📐</span> Esquema del circuito AC → DC
+                    </h2>
+                    <div class="bg-slate-900 rounded-lg p-2 flex justify-center">
+                        <svg viewBox="0 0 850 420" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto max-w-4xl drop-shadow-lg" id="circuitoEsquema">
+                            <!-- Se dibuja dinámicamente con JS -->
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Formas de onda (osciloscopio simulado) -->
+                <div class="bg-slate-800 rounded-xl shadow-lg p-4 border border-slate-700">
+                    <h2 class="text-white text-md font-semibold mb-3 flex items-center gap-2">
+                        <span>📈</span> Formas de onda (Osciloscopio virtual)
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- AC secundario -->
+                        <div class="waveform rounded-lg p-3 border border-slate-600">
+                            <div class="text-white text-xs mb-2">🟡 Secundario del transformador (AC 12V)</div>
+                            <canvas id="waveAcCanvas" width="400" height="140" class="w-full bg-black/40 rounded"></canvas>
+                        </div>
+                        <!-- Salida rectificada (puente de diodos) -->
+                        <div class="waveform rounded-lg p-3 border border-slate-600">
+                            <div class="text-white text-xs mb-2">🟢 Después del puente rectificador + filtro capacitor</div>
+                            <canvas id="waveDcCanvas" width="400" height="140" class="w-full bg-black/40 rounded"></canvas>
+                        </div>
+                    </div>
+                    <div class="text-slate-400 text-xs mt-3 text-center">
+                        * El capacitor reduce el rizado y mantiene la tensión más constante para la bombilla
+                    </div>
+                </div>
+                
+                <!-- Bombilla virtual -->
+                <div class="bg-slate-800 rounded-xl shadow-lg p-5 border border-slate-700 flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="text-4xl" id="bombillaIcon">💡</div>
+                        <div>
+                            <div class="text-white font-semibold">Bombilla DC</div>
+                            <div class="text-slate-400 text-xs" id="estadoBombilla">Apagada (V=0)</div>
+                        </div>
+                    </div>
+                    <div class="h-8 w-40 bg-slate-700 rounded-full overflow-hidden">
+                        <div id="brilloBar" class="h-full bg-yellow-500 w-0 transition-all duration-300"></div>
+                    </div>
+                    <div id="luminosidadTexto" class="text-yellow-400 text-sm font-mono">0%</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer explicativo -->
+        <div class="mt-6 text-center text-xs text-slate-500 border-t border-slate-700 pt-4">
+            Simulador de fuente lineal: Transformador reductor 120V→12V, puente rectificador de 4 diodos (1N4007) y filtro capacitivo. Corriente continua para bombilla incandescente.
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Elementos
+            const potenciaSlider = document.getElementById('potenciaBombilla');
+            const potenciaValor = document.getElementById('potenciaValor');
+            const capacitorSlider = document.getElementById('capacitorValor');
+            const capMostrar = document.getElementById('capMostrar');
+            
+            const vPrimarioSpan = document.getElementById('vPrimario');
+            const vSecundarioACSpan = document.getElementById('vSecundarioAC');
+            const vSalidaDCSpan = document.getElementById('vSalidaDC');
+            const corrienteSpan = document.getElementById('corrienteDC');
+            const rizadoSpan = document.getElementById('rizadoValor');
+            const estadoBombillaDiv = document.getElementById('estadoBombilla');
+            const brilloBar = document.getElementById('brilloBar');
+            const luminosidadTexto = document.getElementById('luminosidadTexto');
+            const bombillaIcon = document.getElementById('bombillaIcon');
+            
+            // Canvas
+            const canvasAc = document.getElementById('waveAcCanvas');
+            const ctxAc = canvasAc.getContext('2d');
+            const canvasDc = document.getElementById('waveDcCanvas');
+            const ctxDc = canvasDc.getContext('2d');
+            
+            // Parámetros fijos
+            const V_PRIMARIO_RMS = 120;   // 120V AC
+            const RELACION_TRANSFORMADOR = 10;  // 120:12 => 10:1
+            const V_SEC_RMS = V_PRIMARIO_RMS / RELACION_TRANSFORMADOR;  // 12V RMS
+            const V_SEC_PICO = V_SEC_RMS * Math.sqrt(2); // ~16.97V pico
+            const CAIDA_DIODOS = 1.4;   // 2 diodos en serie en el puente (cada 0.7V) => 1.4V
+            
+            // Variables dinámicas
+            let potenciaBombillaWatts = 12;   // W
+            let capacitancia_uF = 2200;       // μF
+            let resistenciaCarga = 0;
+            let vDC_promedio = 0;
+            let corrienteDC = 0;
+            let rizadoVpp = 0;
+            let frecuenciaRed = 60; // Hz
+            
+            // Dimensiones canvas
+            function resizeCanvases() {
+                const containerAc = canvasAc.parentElement;
+                const containerDc = canvasDc.parentElement;
+                canvasAc.width = containerAc.clientWidth - 20;
+                canvasAc.height = 140;
+                canvasDc.width = containerDc.clientWidth - 20;
+                canvasDc.height = 140;
+                actualizarTodo();
+            }
+            window.addEventListener('resize', () => resizeCanvases());
+            
+            // Cálculo de todo
+            function calcularCircuitos() {
+                // Resistencia de la bombilla: R = V^2 / P   (para V nominal 12V)
+                resistenciaCarga = (V_SEC_PICO * V_SEC_PICO) / potenciaBombillaWatts;
+                // Pero en realidad la bombilla se alimenta con Vdc menos rizado, iteración simple:
+                let vPicoRectificado = V_SEC_PICO - CAIDA_DIODOS;  // ~15.57V pico
+                // Estimación del voltaje DC promedio con filtro: Vdc ≈ Vpico - (Vripple/2)
+                corrienteDC = vPicoRectificado / resistenciaCarga;
+                if (corrienteDC < 0) corrienteDC = 0;
+                // Rizado aproximado: Vr = I / (2 * f * C)
+                let C_farad = capacitancia_uF / 1_000_000;
+                rizadoVpp = corrienteDC / (2 * frecuenciaRed * C_farad);
+                if (isNaN(rizadoVpp) || rizadoVpp > vPicoRectificado) rizadoVpp = 0.5;
+                vDC_promedio = vPicoRectificado - (rizadoVpp / 2);
+                if (vDC_promedio < 0) vDC_promedio = 0;
+                // Corriente ajustada con VDC real
+                corrienteDC = vDC_promedio / resistenciaCarga;
+                if (corrienteDC < 0) corrienteDC = 0;
+                
+                // Mostrar valores
+                vPrimarioSpan.innerText = V_PRIMARIO_RMS;
+                vSecundarioACSpan.innerText = V_SEC_RMS.toFixed(1);
+                vSalidaDCSpan.innerText = vDC_promedio.toFixed(1);
+                corrienteSpan.innerText = corrienteDC.toFixed(2);
+                rizadoSpan.innerText = (rizadoVpp * 1000).toFixed(0);
+                
+                // Estado bombilla
+                let porcentajeBrillo = Math.min(100, (vDC_promedio / 12) * 100);
+                if (porcentajeBrillo < 0) porcentajeBrillo = 0;
+                brilloBar.style.width = `${porcentajeBrillo}%`;
+                luminosidadTexto.innerText = `${Math.floor(porcentajeBrillo)}%`;
+                if (vDC_promedio > 3) {
+                    estadoBombillaDiv.innerHTML = "💡 Encendida - Brillo variable";
+                    bombillaIcon.style.filter = "drop-shadow(0 0 6px gold)";
+                } else {
+                    estadoBombillaDiv.innerHTML = "🌙 Apagada - Tensión insuficiente";
+                    bombillaIcon.style.filter = "none";
+                }
+            }
+            
+            // Dibujar formas de onda
+            function dibujarOndaAC() {
+                if (!ctxAc || canvasAc.width === 0) return;
+                const w = canvasAc.width;
+                const h = canvasAc.height;
+                ctxAc.clearRect(0, 0, w, h);
+                ctxAc.beginPath();
+                ctxAc.strokeStyle = "#fbbf24";
+                ctxAc.lineWidth = 2;
+                const medio = h/2;
+                const amplitud = (h/2) * 0.8;
+                for (let x = 0; x < w; x++) {
+                    let t = (x / w) * (2 * Math.PI * 2); // 2 ciclos
+                    let y = medio + Math.sin(t) * amplitud;
+                    if (x === 0) ctxAc.moveTo(x, y);
+                    else ctxAc.lineTo(x, y);
+                }
+                ctxAc.stroke();
+                ctxAc.fillStyle = "#facc15";
+                ctxAc.font = "10px monospace";
+                ctxAc.fillText("~12V AC", 10, 20);
+            }
+            
+            function dibujarOndaDC() {
+                if (!ctxDc || canvasDc.width === 0) return;
+                const w = canvasDc.width;
+                const h = canvasDc.height;
+                ctxDc.clearRect(0, 0, w, h);
+                ctxDc.beginPath();
+                ctxDc.strokeStyle = "#4ade80";
+                ctxDc.lineWidth = 2.5;
+                const medioBase = h - 20;
+                const vMax = V_SEC_PICO - CAIDA_DIODOS;  // ~15.6V
+                let nivelNormalizado = Math.min(1, vDC_promedio / vMax);
+                let nivelY = medioBase - (nivelNormalizado * (h - 40));
+                
+                // Dibujar rizado senoidal
+                ctxDc.beginPath();
+                const rippleAmplitud = (rizadoVpp / vMax) * (h - 40) * 0.5;
+                for (let x = 0; x < w; x++) {
+                    let t = (x / w) * (Math.PI * 4); // 2 ciclos
+                    let ripple = Math.sin(t) * rippleAmplitud;
+                    let y = nivelY + ripple;
+                    if (x === 0) ctxDc.moveTo(x, y);
+                    else ctxDc.lineTo(x, y);
+                }
+                ctxDc.stroke();
+                ctxDc.fillStyle = "#86efac";
+                ctxDc.font = "10px monospace";
+                ctxDc.fillText(`DC filtrada: ${vDC_promedio.toFixed(1)}V, Rizado: ${(rizadoVpp*1000).toFixed(0)}mV`, 10, 20);
+                
+                // línea punteada Vpromedio
+                ctxDc.beginPath();
+                ctxDc.setLineDash([4, 6]);
+                ctxDc.strokeStyle = "#facc15";
+                ctxDc.moveTo(0, nivelY);
+                ctxDc.lineTo(w, nivelY);
+                ctxDc.stroke();
+                ctxDc.setLineDash([]);
+            }
+            
+            // Dibujar esquema SVG del circuito (completo: transformador, puente de diodos, capacitor, bombilla)
+            function dibujarEsquema() {
+                const svg = document.getElementById('circuitoEsquema');
+                const VdcMostrar = vDC_promedio.toFixed(1);
+                svg.innerHTML = `
+                    <svg viewBox="0 0 850 420" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="850" height="420" fill="#0f172a" rx="12" />
+                        
+                        <!-- Transformador primario -->
+                        <text x="60" y="60" fill="#94a3b8" font-size="11">120V AC</text>
+                        <path d="M 40 80 L 100 80" stroke="#cbd5e1" stroke-width="3" />
+                        <path d="M 40 110 L 100 110" stroke="#cbd5e1" stroke-width="3" />
+                        <rect x="80" y="65" width="30" height="60" fill="none" stroke="#facc15" stroke-width="2" stroke-dasharray="4" />
+                        
+                        <!-- Transformador secundario -->
+                        <path d="M 180 80 L 220 80" stroke="#cbd5e1" stroke-width="3" />
+                        <path d="M 180 110 L 220 110" stroke="#cbd5e1" stroke-width="3" />
+                        <text x="190" y="60" fill="#94a3b8" font-size="11">12V AC</text>
+                        
+                        <!-- Puente de diodos (4 diodos) -->
+                        <!-- D1 superior izquierda -->
+                        <polygon points="260,60 280,80 260,100" fill="#ef4444" />
+                        <line x1="280" y1="80" x2="290" y2="80" stroke="#ef4444" stroke-width="3" />
+                        <!-- D2 superior derecha -->
+                        <polygon points="330,60 350,80 330,100" fill="#ef4444" />
+                        <line x1="350" y1="80" x2="360" y2="80" stroke="#ef4444" stroke-width="3" />
+                        <!-- D3 inferior izquierda -->
+                        <polygon points="260,130 280,150 260,170" fill="#ef4444" />
+                        <line x1="280" y1="150" x2="290" y2="150" stroke="#ef4444" stroke-width="3" />
+                        <!-- D4 inferior derecha -->
+                        <polygon points="330,130 350,150 330,170" fill="#ef4444" />
+                        <line x1="350" y1="150" x2="360" y2="150" stroke="#ef4444" stroke-width="3" />
+                        
+                        <!-- Conexiones AC al puente -->
+                        <path d="M 220 95 L 260 95 L 260 80" stroke="#94a3b8" stroke-width="2" />
+                        <path d="M 220 95 L 260 95 L 260 150" stroke="#94a3b8" stroke-width="2" />
+                        <path d="M 360 80 L 390 80" stroke="#94a3b8" stroke-width="2" />
+                        <path d="M 360 150 L 390 150" stroke="#94a3b8" stroke-width="2" />
+                        
+                        <!-- Capacitor electrolítico -->
+                        <text x="430" y="70" fill="#22d3ee" font-size="10">${capacitancia_uF} µF</text>
+                        <line x1="420" y1="80" x2="420" y2="150" stroke="#a5f3fc" stroke-width="3" />
+                        <rect x="410" y="80" width="20" height="12" fill="#0891b2" />
+                        <rect x="410" y="138" width="20" height="12" fill="#0891b2" />
+                        <text x="450" y="148" fill="#a5f3fc" font-size="9">+</text>
+                        
+                        <!-- Bombilla DC -->
+                        <circle cx="590" cy="115" r="28" fill="#fef08a" stroke="#eab308" stroke-width="3" />
+                        <text x="590" y="120" fill="#854d0e" font-size="12" text-anchor="middle">💡</text>
+                        <text x="590" y="160" fill="#facc15" font-size="10" text-anchor="middle">${VdcMostrar}V DC</text>
+                        
+                        <!-- Conexiones + y - -->
+                        <path d="M 390 80 L 420 80 L 420 86" stroke="#4ade80" stroke-width="3" />
+                        <path d="M 390 150 L 420 150 L 420 142" stroke="#ef4444" stroke-width="3" />
+                        <path d="M 440 115 L 560 115" stroke="#4ade80" stroke-width="3" />
+                        <path d="M 440 145 L 560 145" stroke="#ef4444" stroke-width="3" />
+                        
+                        <!-- Resistencia de carga (bombilla) interna -->
+                        <rect x="530" y="108" width="20" height="15" fill="#fcd34d" />
+                        <text x="640" y="120" fill="#94a3b8" font-size="9">R_bombilla ${resistenciaCarga.toFixed(1)} Ω</text>
+                        
+                        <!-- Etiquetas de polaridad -->
+                        <text x="460" y="75" fill="#4ade80" font-size="9">+ VCC</text>
+                        <text x="460" y="170" fill="#ef4444" font-size="9">- GND</text>
+                        
+                        <!-- Flechas corriente DC -->
+                        <path d="M 500 115 L 530 115" stroke="#4ade80" stroke-width="2" marker-end="url(#flechaVerde)" />
+                        <defs><marker id="flechaVerde" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="#4ade80" /></marker></defs>
+                    </svg>
+                `;
+            }
+            
+            // Actualizar todo
+            function actualizarTodo() {
+                potenciaBombillaWatts = parseFloat(potenciaSlider.value);
+                potenciaValor.innerText = `${potenciaBombillaWatts} W`;
+                capacitancia_uF = parseFloat(capacitorSlider.value);
+                capMostrar.innerText = `${capacitancia_uF} μF`;
+                calcularCircuitos();
+                dibujarOndaAC();
+                dibujarOndaDC();
+                dibujarEsquema();
+            }
+            
+            // Eventos
+            potenciaSlider.addEventListener('input', () => { actualizarTodo(); });
+            capacitorSlider.addEventListener('input', () => { actualizarTodo(); });
+            
+            resizeCanvases();
+            setInterval(() => {
+                // Actualización continua para reflejar cambios de parámetros
+                actualizarTodo();
+            }, 100);
+        })();
+    </script>
+</body>
+</html>
