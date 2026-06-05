@@ -2,393 +2,1510 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Simulador de Diodo - Unión PN | Electrónica Interactiva</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Voltaje Explicado - Aprendizaje Interactivo</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para iconos de alta calidad -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Personalización del slider para que se vea moderno */
-        input[type="range"] {
-            -webkit-appearance: none;
-            background: transparent;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
         }
-        input[type="range"]:focus {
-            outline: none;
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-        input[type="range"]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 9999px;
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
         }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background: #2563eb;
-            margin-top: -7px;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
         }
-        input[type="range"]::-webkit-slider-thumb:hover {
-            background: #1d4ed8;
-            transform: scale(1.1);
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
         }
-        /* Animación sutil para el voltaje */
-        .voltage-value {
-            transition: all 0.1s ease;
+        /* Glowing effects */
+        .glow-blue {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+        .glow-amber {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+        }
+        .glow-green {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+        /* Particle animation helper classes */
+        @keyframes flow {
+            to {
+                stroke-dashoffset: -40;
+            }
+        }
+        .electron-flow {
+            stroke-dasharray: 8 12;
+            animation: flow 1s linear infinite;
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen p-4 md:p-6 font-sans">
+<body class="text-slate-100 min-h-screen flex flex-col">
 
-    <div class="max-w-7xl mx-auto">
-        
-        <!-- Header principal -->
-        <div class="bg-white rounded-2xl shadow-lg p-5 mb-6 border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div class="flex items-center gap-4">
-                <div class="bg-blue-100 p-3 rounded-xl text-blue-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4L20 4 20 20 4 20Z"/><path d="M8 8h8v8H8z"/><path d="M12 12h.01"/></svg>
+    <!-- Encabezado principal -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 p-2 rounded-lg text-white glow-blue">
+                    <i class="fa-solid fa-bolt text-xl animate-pulse"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-800">⚡ Simulador de Diodo de Unión PN</h1>
-                    <p class="text-slate-500 text-sm">Modelo ideal con tensión umbral | Silicio (0.7V) vs Germanio (0.3V) | Visualización en tiempo real</p>
+                    <h1 class="font-extrabold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+                        Mentalidad Eléctrica
+                    </h1>
+                    <p class="text-xs text-slate-400">Guía Interactiva de Voltaje y Tensión</p>
                 </div>
             </div>
-            <div class="bg-slate-100 px-4 py-2 rounded-full text-xs font-mono text-slate-600">
-                🧪 Ley de Ohm + Diodo
+            <div class="flex items-center space-x-3 text-xs sm:text-sm bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                <span class="text-slate-300 font-medium">Laboratorio Activo</span>
             </div>
         </div>
+    </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+        <!-- Hero Section con la intro del video -->
+        <section class="bg-gradient-to-br from-slate-900 via-slate-900 to-blue-950/40 rounded-3xl border border-slate-800 p-6 sm:p-8 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+            <div class="absolute -right-24 -bottom-24 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-24 -top-24 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
             
-            <!-- ================= PANEL DE CONTROL IZQUIERDO ================= -->
-            <div class="space-y-5">
-                
-                <!-- Tarjeta de fuente y dopaje -->
-                <div class="bg-white rounded-xl shadow-md p-5 border border-slate-200">
-                    <div class="flex items-center gap-2 text-slate-700 mb-4 border-b border-slate-100 pb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
-                        <h2 class="font-semibold">Fuente de Tensión DC</h2>
-                    </div>
-                    
-                    <div class="space-y-5">
-                        <div>
-                            <div class="flex justify-between text-sm font-medium mb-1">
-                                <span>Voltaje aplicado (Vs):</span>
-                                <span id="voltajeDisplay" class="text-blue-600 font-bold text-lg voltage-value">5.0 V</span>
+            <div class="space-y-4 flex-1">
+                <div class="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-semibold">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Inspirado en el Video Oficial</span>
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-50 tracking-tight leading-tight">
+                    ¿Qué es el Voltaje?
+                </h2>
+                <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                    A menudo oímos hablar de los volts y el voltaje, pero ¿qué son realmente? El voltaje es la <strong class="text-blue-400">presión eléctrica</strong> que empuja a los electrones libres a través de un conductor para generar trabajo. ¡Explora los módulos de este laboratorio interactivo y descúbrelo por ti mismo!
+                </p>
+                <div class="flex flex-wrap gap-3 pt-2">
+                    <a href="https://www.youtube.com/watch?v=Xe1JmmZSmK8" target="_blank" class="bg-red-600 hover:bg-red-700 text-white font-medium text-xs sm:text-sm px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow-lg shadow-red-900/30">
+                        <i class="fa-brands fa-youtube text-lg"></i> Ver Video Original
+                    </a>
+                    <button onclick="scrollToLab()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-xs sm:text-sm px-4 py-2.5 rounded-xl transition flex items-center gap-2">
+                        <i class="fa-solid fa-circle-play"></i> Comenzar Laboratorio
+                    </button>
+                </div>
+            </div>
+            <div class="w-full md:w-1/3 max-w-[320px] bg-slate-950/80 p-5 rounded-2xl border border-slate-800 shadow-2xl relative">
+                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-blue-400"></i> Objetivos de Aprendizaje
+                </h3>
+                <ul class="space-y-3.5 text-xs text-slate-300">
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                        <span>Entender la diferencia de potencial (Analogía de Lagos).</span>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                        <span>Comparar fuentes en serie y en paralelo.</span>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                        <span>Visualizar ondas de Tensión Continua (DC) y Alterna (AC).</span>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                        <span>Aprender a medir la tensión con un multímetro.</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Módulo 1: Analogía de Presión (Agua vs Electricidad) -->
+        <section id="laboratorio" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div class="space-y-1">
+                    <span class="text-xs font-bold text-blue-500 uppercase tracking-widest">Módulo 1</span>
+                    <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid fa-water text-cyan-400"></i> Analogía de Presión Hidráulica
+                    </h3>
+                </div>
+                <p class="text-xs text-slate-400 max-w-md">
+                    El voltaje es una "diferencia de potencial". Si no hay diferencia de nivel (altura de los lagos), el agua (los electrones) no fluirá.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Controles -->
+                <div class="lg:col-span-4 bg-slate-950/60 p-5 rounded-xl border border-slate-800/80 flex flex-col justify-between space-y-4">
+                    <div class="space-y-4">
+                        <h4 class="font-semibold text-sm text-slate-200">Ajustar Diferencia de Altura</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs text-slate-400">
+                                <span>Lago Superior (Altura)</span>
+                                <span id="height-val" class="text-cyan-400 font-bold">10 metros</span>
                             </div>
-                            <input type="range" id="voltajeSlider" min="-12" max="12" step="0.05" value="5" class="w-full">
-                            <div class="flex justify-between text-xs text-slate-400 mt-1">
-                                <span>-12V (Inversa fuerte)</span>
-                                <span>0V</span>
-                                <span>+12V (Directa)</span>
-                            </div>
+                            <input id="lake-height" type="range" min="0" max="20" value="10" class="w-full accent-cyan-500 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
                         </div>
-                        
-                        <!-- Selector de tipo de diodo (dopaje implícito) -->
-                        <div>
-                            <label class="block text-sm font-medium text-slate-600 mb-2">🔌 Tipo de Diodo (Material)</label>
-                            <select id="tipoDiodo" class="w-full border border-slate-300 rounded-lg p-2.5 bg-white shadow-sm focus:ring-2 focus:ring-blue-400 outline-none">
-                                <option value="silicio">🔘 Silicio (1N4007) - Vf = 0.70 V | Dopaje estándar</option>
-                                <option value="germanio">🟡 Germanio (OA90) - Vf = 0.30 V | Dopaje más ligero</option>
-                                <option value="schottky">⚡ Schottky (1N5819) - Vf = 0.22 V | Unión metal-semiconductor</option>
-                            </select>
-                            <p class="text-xs text-slate-400 mt-1">※ La tensión umbral depende del dopaje y material</p>
+
+                        <div class="p-4 bg-slate-900/80 rounded-lg border border-slate-800 text-xs text-slate-300 space-y-2.5">
+                            <p class="font-medium text-slate-100 flex items-center gap-1.5">
+                                <i class="fa-solid fa-lightbulb text-amber-400"></i> ¿Qué está ocurriendo?
+                            </p>
+                            <p id="water-explanation">
+                                Al elevar el lago superior, creas una gran <strong class="text-cyan-400">diferencia de potencial (Gravedad)</strong>. Al abrir la compuerta, el agua fluye empujando la turbina. Esto genera trabajo para encender la luz de la ciudad.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Datos en tiempo real -->
+                    <div class="grid grid-cols-2 gap-3 bg-slate-900 p-3 rounded-lg border border-slate-800 text-center">
+                        <div class="space-y-0.5">
+                            <span class="text-[10px] text-slate-400 uppercase font-semibold">Presión (Voltios)</span>
+                            <p id="p-volt" class="text-lg font-bold text-cyan-400">10 V</p>
+                        </div>
+                        <div class="space-y-0.5">
+                            <span class="text-[10px] text-slate-400 uppercase font-semibold">Flujo (Amperios)</span>
+                            <p id="p-amp" class="text-lg font-bold text-emerald-400">2.0 A</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Panel de instrumentos (medidores digitales) -->
-                <div class="bg-slate-900 rounded-xl shadow-xl p-5 text-white border border-slate-700">
-                    <div class="flex items-center gap-2 mb-4 text-slate-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M8 12h8"/></svg>
-                        <span class="text-sm uppercase tracking-wider">Instrumentos Virtuales</span>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-black/40 p-3 rounded-lg border border-slate-700">
-                            <div class="text-xs text-slate-400">Corriente (I)</div>
-                            <div class="text-2xl md:text-3xl font-mono font-bold" id="corrienteValor">0.00</div>
-                            <div class="text-xs text-emerald-400">mA</div>
-                        </div>
-                        <div class="bg-black/40 p-3 rounded-lg border border-slate-700">
-                            <div class="text-xs text-slate-400">Tensión Diodo (Vd)</div>
-                            <div class="text-2xl md:text-3xl font-mono font-bold" id="voltajeDiodoValor">0.00</div>
-                            <div class="text-xs text-blue-400">V</div>
-                        </div>
-                        <div class="bg-black/40 p-3 rounded-lg border border-slate-700 col-span-2">
-                            <div class="text-xs text-slate-400">Potencia disipada (Pd)</div>
-                            <div class="text-xl font-mono font-bold" id="potenciaValor">0.00</div>
-                            <div class="text-xs text-yellow-400">mW</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Estado del diodo -->
-                    <div class="mt-4 pt-3 border-t border-slate-700">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-slate-300">Estado de la unión:</span>
-                            <span id="estadoDiodo" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-900 text-emerald-300">Corte</span>
-                        </div>
-                        <div id="explicacionFisica" class="text-xs text-slate-400 mt-2 italic">
-                            🔬 Aplicando polarización directa > 0.7V para conducir.
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Info de dopaje -->
-                <div class="bg-white rounded-xl shadow-md p-4 border border-slate-200 text-sm">
-                    <div class="flex gap-2 items-center text-slate-600 font-semibold mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-                        <span>Modelo de dopaje (N y P)</span>
-                    </div>
-                    <p class="text-slate-500 leading-relaxed">
-                        El diodo se forma con una unión de semiconductor <span class="font-semibold text-blue-600">tipo N</span> (rico en electrones, dopado con fósforo) y <span class="font-semibold text-red-600">tipo P</span> (rico en huecos, dopado con boro). 
-                        La barrera de potencial (Vf) depende del dopaje y material.
-                    </p>
-                </div>
-            </div>
-
-            <!-- ================= PANEL DERECHO: DIAGRAMA Y SIMULACIÓN ================= -->
-            <div class="lg:col-span-2 bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-                <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center flex-wrap gap-2">
-                    <div class="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/></svg>
-                        <span class="font-medium">Circuito serie: Fuente → Diodo → Resistencia 1kΩ</span>
-                    </div>
-                    <div id="indicadorConduccion" class="text-xs px-2 py-1 rounded-full bg-slate-200 text-slate-600">⛔ Sin flujo</div>
-                </div>
-                
-                <!-- SVG del circuito animado (totalmente redibujado con JS) -->
-                <div class="bg-white p-4 flex justify-center items-center min-h-[420px] relative">
-                    <svg width="750" height="380" viewBox="0 0 750 380" xmlns="http://www.w3.org/2000/svg" class="max-w-full h-auto drop-shadow-sm" id="circuitoSvg">
-                        <!-- Aquí se dibujará todo mediante JS para mantener coherencia -->
-                        <!-- El fondo y elementos estáticos se reescribirán dinámicamente -->
-                    </svg>
-                </div>
-
-                <!-- Leyenda interactiva -->
-                <div class="p-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-500 grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-red-500 rounded-full"></span> <span>Corriente convencional (de + a -)</span></div>
-                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-green-600 rounded-full"></span> <span>Diodo polarizado directamente</span></div>
-                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-slate-400 rounded-full"></span> <span>Resistencia de carga R=1kΩ</span></div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Footer explicativo -->
-        <div class="mt-6 text-center text-xs text-slate-400">
-            Simulador interactivo de electrónica - Comportamiento de un diodo rectificador (unión PN). La corriente solo fluye cuando V_aplicado > V_umbral (Barrera de potencial).
-        </div>
-    </div>
-
-    <script>
-        (function() {
-            // Elementos del DOM
-            const slider = document.getElementById('voltajeSlider');
-            const voltajeDisplay = document.getElementById('voltajeDisplay');
-            const corrienteSpan = document.getElementById('corrienteValor');
-            const voltajeDiodoSpan = document.getElementById('voltajeDiodoValor');
-            const potenciaSpan = document.getElementById('potenciaValor');
-            const estadoSpan = document.getElementById('estadoDiodo');
-            const explicacionDiv = document.getElementById('explicacionFisica');
-            const indicadorConduccion = document.getElementById('indicadorConduccion');
-            const selectDiodo = document.getElementById('tipoDiodo');
-            const svgContainer = document.getElementById('circuitoSvg');
-            
-            // Parámetros del circuito
-            const R = 1000; // 1k Ohm
-            
-            // Parámetros de los tipos de diodo (Vf y color de ánodo)
-            const diodos = {
-                silicio: { vf: 0.70, nombre: 'Silicio 1N4007', color: '#2563eb', dopaje: 'Dopaje medio (Barrera 0.7V)' },
-                germanio: { vf: 0.30, nombre: 'Germanio OA90', color: '#d97706', dopaje: 'Dopaje ligero (Barrera 0.3V)' },
-                schottky: { vf: 0.22, nombre: 'Schottky 1N5819', color: '#10b981', dopaje: 'Unión metal-semiconductor (Vf bajo)' }
-            };
-            
-            let voltajeAplicado = 5.0;  // volts
-            let tipoActual = 'silicio';
-            
-            // Función para actualizar todos los calculos y el SVG
-            function actualizarSimulador() {
-                const vf = diodos[tipoActual].vf;
-                let corriente_mA = 0;
-                let tensionDiodo = 0;
-                let estado = "";
-                let colorEstado = "";
-                let explicacion = "";
-                let flujoActivo = false;
-                
-                // Cálculo según región
-                if (voltajeAplicado > vf) {
-                    // REGIÓN DIRECTA: Conducción
-                    tensionDiodo = vf;
-                    corriente_mA = ((voltajeAplicado - vf) / R) * 1000; // I en mA
-                    estado = "✅ CONDUCCIÓN (Directa)";
-                    colorEstado = "bg-emerald-900 text-emerald-300";
-                    explicacion = `🔁 Polarización directa: V aplicado (${voltajeAplicado.toFixed(2)}V) > Vf (${vf}V). La barrera se supera y fluyen ${corriente_mA.toFixed(2)} mA.`;
-                    flujoActivo = true;
-                } 
-                else if (voltajeAplicado >= 0 && voltajeAplicado <= vf) {
-                    // REGIÓN DE CORTE (umbral no alcanzado)
-                    tensionDiodo = voltajeAplicado;
-                    corriente_mA = 0;
-                    estado = "⏸️ CORTE (Barrera no superada)";
-                    colorEstado = "bg-yellow-900 text-yellow-300";
-                    explicacion = `⚠️ Tensión aplicada (${voltajeAplicado.toFixed(2)}V) es menor a la barrera de ${vf}V. El diodo se comporta como circuito abierto. I = 0 mA.`;
-                    flujoActivo = false;
-                }
-                else {
-                    // POLARIZACIÓN INVERSA (voltaje negativo)
-                    tensionDiodo = voltajeAplicado;
-                    corriente_mA = 0;
-                    estado = "🚫 BLOQUEO INVERSO";
-                    colorEstado = "bg-red-900 text-red-300";
-                    explicacion = `⛔ Polarización inversa: El cátodo está más positivo que el ánodo. La zona de deplexión se ensancha y NO circula corriente (solo fuga despreciable).`;
-                    flujoActivo = false;
-                }
-                
-                // Potencia disipada en el diodo (mW)
-                let potencia_mW = Math.abs(tensionDiodo * (corriente_mA / 1000)) * 1000;
-                if (corriente_mA === 0) potencia_mW = 0;
-                
-                // Actualizar UI
-                voltajeDisplay.innerText = voltajeAplicado.toFixed(2) + " V";
-                corrienteSpan.innerText = corriente_mA.toFixed(2);
-                voltajeDiodoSpan.innerText = tensionDiodo.toFixed(3);
-                potenciaSpan.innerText = potencia_mW.toFixed(2);
-                estadoSpan.innerText = estado;
-                estadoSpan.className = `px-3 py-1 rounded-full text-xs font-bold ${colorEstado}`;
-                explicacionDiv.innerHTML = `🔬 ${explicacion}`;
-                indicadorConduccion.innerHTML = flujoActivo ? "🔴 FLUJO ACTIVO" : "⚫ SIN FLUJO";
-                indicadorConduccion.className = flujoActivo ? "text-xs px-2 py-1 rounded-full bg-red-100 text-red-700 font-semibold" : "text-xs px-2 py-1 rounded-full bg-slate-200 text-slate-600";
-                
-                // Dibujar el circuito SVG (actualización completa)
-                dibujarCircuito(flujoActivo, voltajeAplicado, tensionDiodo, vf, tipoActual);
-            }
-            
-            // Función para dibujar el circuito con animación y detalles
-            function dibujarCircuito(fluyendo, vAplicado, vDiodo, vf, tipo) {
-                const colores = diodos[tipo];
-                const diodoColor = fluyendo ? "#ef4444" : "#475569";
-                const trazoFlujo = fluyendo ? "#ef4444" : "#cbd5e1";
-                const anchoFlujo = fluyendo ? 4 : 2;
-                
-                const svgHtml = `
-                    <svg width="100%" height="100%" viewBox="0 0 750 380" xmlns="http://www.w3.org/2000/svg">
+                <!-- Simulación Visual de Agua (SVG animado mediante JS) -->
+                <div class="lg:col-span-8 bg-slate-950 p-4 rounded-xl border border-slate-800 flex items-center justify-center min-h-[300px]">
+                    <svg id="water-svg" viewBox="0 0 600 300" class="w-full max-w-2xl h-auto overflow-visible">
+                        <!-- Definiciones de Gradientes -->
                         <defs>
-                            <marker id="flecha" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-                                <polygon points="0 0, 8 3, 0 6" fill="#ef4444" />
-                            </marker>
-                            <linearGradient id="gradBateria" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#f1f5f9;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#cbd5e1;stop-opacity:1" />
+                            <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#020617"/>
+                                <stop offset="100%" stop-color="#0f172a"/>
+                            </linearGradient>
+                            <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#06b6d4"/>
+                                <stop offset="100%" stop-color="#0369a1"/>
+                            </linearGradient>
+                            <linearGradient id="landGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#1e293b"/>
+                                <stop offset="100%" stop-color="#0f172a"/>
                             </linearGradient>
                         </defs>
+
+                        <!-- Fondo Cielo -->
+                        <rect width="600" height="300" rx="10" fill="url(#skyGrad)"/>
                         
-                        <!-- Fondo sutil -->
-                        <rect width="750" height="380" fill="#ffffff" rx="10" />
+                        <!-- Terreno / Lagos -->
+                        <!-- Lago Superior (Izquierda) ajustable en altura mediante JS -->
+                        <path id="land-path" d="M 0 250 L 150 250 L 150 300 L 0 300 Z" fill="url(#landGrad)" stroke="#334155" stroke-width="2"/>
+                        <!-- Canal de Caída -->
+                        <rect x="150" y="240" width="10" height="60" fill="none" stroke="#334155" stroke-width="2"/>
+                        <!-- Terreno Derecho (Lago Inferior) -->
+                        <path d="M 280 250 L 600 250 L 600 300 L 280 300 Z" fill="url(#landGrad)" stroke="#334155" stroke-width="2"/>
                         
-                        <!-- Trazado del circuito principal -->
-                        <path d="M 80 180 L 180 180 L 180 100 L 550 100 L 550 180 L 620 180" fill="none" stroke="#94a3b8" stroke-width="4" />
-                        <path d="M 80 280 L 620 280 L 620 180" fill="none" stroke="#94a3b8" stroke-width="4" />
+                        <!-- Canal de Conexión central para la turbina -->
+                        <path d="M 150 250 L 280 250" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="5 5"/>
+
+                        <!-- AGUA LAGO SUPERIOR (Izquierda) -->
+                        <rect id="water-left" x="5" y="150" width="140" height="98" fill="url(#waterGrad)" opacity="0.8" rx="2"/>
                         
-                        <!-- Fuente de tensión (Batería) -->
-                        <g transform="translate(80, 230)">
-                            <rect x="-35" y="-45" width="70" height="90" fill="url(#gradBateria)" stroke="#475569" stroke-width="3" rx="6" />
-                            <line x1="-45" y1="0" x2="-35" y2="0" stroke="#475569" stroke-width="5" />
-                            <line x1="35" y1="0" x2="45" y2="0" stroke="#475569" stroke-width="5" />
-                            <circle cx="0" cy="0" r="28" fill="white" stroke="#3b82f6" stroke-width="3" />
-                            <text x="0" y="8" font-family="monospace" font-size="20" text-anchor="middle" fill="#1e293b" font-weight="bold">Vs</text>
-                            <!-- Polos + y - dinámicos -->
-                            <text x="0" y="-65" font-size="24" text-anchor="middle" fill="${vAplicado >= 0 ? '#ef4444' : '#3b82f6'}" font-weight="bold">${vAplicado >= 0 ? '+' : '-'}</text>
-                            <text x="0" y="80" font-size="24" text-anchor="middle" fill="${vAplicado >= 0 ? '#3b82f6' : '#ef4444'}" font-weight="bold">${vAplicado >= 0 ? '-' : '+'}</text>
-                            <text x="0" y="-20" font-size="12" text-anchor="middle" fill="#1e293b">${vAplicado.toFixed(2)} V</text>
+                        <!-- AGUA LAGO INFERIOR (Derecha) -->
+                        <rect x="285" y="210" width="310" height="38" fill="url(#waterGrad)" opacity="0.6" rx="2"/>
+
+                        <!-- Cascada / Flujo de Agua -->
+                        <path id="water-stream" d="M 145 150 C 210 150, 210 240, 285 240" fill="none" stroke="#22d3ee" stroke-width="8" opacity="0.8" stroke-linecap="round"/>
+                        
+                        <!-- Turbina / Rueda hidráulica -->
+                        <g id="turbine-group" transform="translate(210, 195)">
+                            <circle cx="0" cy="0" r="30" fill="#334155" stroke="#475569" stroke-width="3"/>
+                            <!-- Aspas de la turbina -->
+                            <line x1="0" y1="-30" x2="0" y2="30" stroke="#94a3b8" stroke-width="4"/>
+                            <line x1="-30" y1="0" x2="30" y2="0" stroke="#94a3b8" stroke-width="4"/>
+                            <line x1="-21" y1="-21" x2="21" y2="21" stroke="#94a3b8" stroke-width="4"/>
+                            <line x1="21" y1="-21" x2="-21" y2="21" stroke="#94a3b8" stroke-width="4"/>
+                            <circle cx="0" cy="0" r="8" fill="#1e293b"/>
                         </g>
-                        
-                        <!-- Amperímetro -->
-                        <g transform="translate(230, 100)">
-                            <circle cx="0" cy="0" r="24" fill="white" stroke="#10b981" stroke-width="4" />
-                            <text x="0" y="7" font-family="sans-serif" font-size="20" text-anchor="middle" fill="#10b981" font-weight="bold">A</text>
+
+                        <!-- Indicadores de Presión (Altura Diferencial) -->
+                        <line id="height-arrow" x1="165" y1="150" x2="165" y2="210" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow)" />
+                        <text id="height-text" x="175" y="180" fill="#f59e0b" font-size="12" font-weight="bold">Δh = 10m</text>
+
+                        <!-- Generador & Ciudad pequeña -->
+                        <rect x="480" y="160" width="80" height="50" rx="6" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+                        <!-- Pequeños edificios de ciudad -->
+                        <path d="M 490 190 L 490 170 L 510 170 L 510 190 Z M 515 190 L 515 165 L 535 165 L 535 190 Z M 540 190 L 540 175 L 555 175 L 555 190 Z" fill="#475569"/>
+                        <!-- Bombilla / Luz de la ciudad -->
+                        <circle id="city-light" cx="525" cy="120" r="16" fill="#f59e0b" filter="drop-shadow(0px 0px 8px rgba(245,158,11,0.5))" opacity="0.8"/>
+                        <!-- Rayos de luz -->
+                        <g id="light-rays">
+                            <line x1="525" y1="95" x2="525" y2="102" stroke="#f59e0b" stroke-width="2"/>
+                            <line x1="525" y1="138" x2="525" y2="145" stroke="#f59e0b" stroke-width="2"/>
+                            <line x1="500" y1="120" x2="507" y2="120" stroke="#f59e0b" stroke-width="2"/>
+                            <line x1="543" y1="120" x2="550" y2="120" stroke="#f59e0b" stroke-width="2"/>
                         </g>
-                        
-                        <!-- Diodo (1N400X) -->
-                        <g transform="translate(430, 100)">
-                            <!-- Triángulo (Ánodo) -->
-                            <polygon points="-24,-24 24,0 -24,24" fill="${diodoColor}" />
-                            <!-- Línea de cátodo -->
-                            <line x1="24" y1="-24" x2="24" y2="24" stroke="${diodoColor}" stroke-width="6" />
-                            <text x="0" y="-38" font-size="12" text-anchor="middle" fill="#334155">${diodos[tipo].nombre}</text>
-                            <text x="-30" y="30" font-size="18" text-anchor="middle" fill="#ef4444" font-weight="bold">+</text>
-                            <text x="38" y="30" font-size="18" text-anchor="middle" fill="#3b82f6" font-weight="bold">-</text>
-                            <text x="0" y="48" font-size="10" text-anchor="middle" fill="#64748b">Vf = ${vf}V</text>
-                        </g>
-                        
-                        <!-- Resistencia de carga -->
-                        <g transform="translate(550, 230)">
-                            <rect x="-18" y="-35" width="36" height="70" fill="#f8fafc" stroke="#1e293b" stroke-width="3" rx="4" />
-                            <text x="45" y="5" font-size="15" text-anchor="middle" fill="#0f172a" font-weight="bold">1 kΩ</text>
-                            <text x="45" y="22" font-size="11" text-anchor="middle" fill="#64748b">R carga</text>
-                        </g>
-                        
-                        <!-- Voltímetro (con líneas de medición en paralelo al diodo) -->
-                        <g transform="translate(430, 55)">
-                            <line x1="-30" y1="45" x2="-30" y2="-10" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4" />
-                            <line x1="30" y1="45" x2="30" y2="-10" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4" />
-                            <circle cx="0" cy="-10" r="22" fill="white" stroke="#3b82f6" stroke-width="3" />
-                            <text x="0" y="-4" font-family="sans-serif" font-size="20" text-anchor="middle" fill="#3b82f6" font-weight="bold">V</text>
-                            <text x="0" y="22" font-size="10" text-anchor="middle" fill="#3b82f6">Vd = ${vDiodo.toFixed(3)} V</text>
-                        </g>
-                        
-                        <!-- ANIMACIÓN DE CORRIENTE (si fluye) -->
-                        ${fluyendo ? `
-                            <path d="M 130 100 L 230 100 L 350 100" fill="none" stroke="#ef4444" stroke-width="5" stroke-dasharray="10 10" stroke-linecap="round">
-                                <animate attributeName="stroke-dashoffset" from="20" to="0" dur="0.8s" repeatCount="indefinite" />
-                            </path>
-                            <path d="M 480 100 L 550 100" fill="none" stroke="#ef4444" stroke-width="5" stroke-dasharray="10 10">
-                                <animate attributeName="stroke-dashoffset" from="20" to="0" dur="0.8s" repeatCount="indefinite" />
-                            </path>
-                            <path d="M 620 180 L 620 260 L 300 260 L 130 260" fill="none" stroke="#ef4444" stroke-width="5" stroke-dasharray="10 10">
-                                <animate attributeName="stroke-dashoffset" from="20" to="0" dur="0.8s" repeatCount="indefinite" />
-                            </path>
-                            <text x="350" y="75" fill="#ef4444" font-size="14" font-weight="bold" text-anchor="middle">I = ${((vAplicado - vf)/1000 * 1000).toFixed(2)} mA</text>
-                        ` : `
-                            <text x="350" y="75" fill="#94a3b8" font-size="13" text-anchor="middle">Circuito abierto (I=0)</text>
-                            <!-- Cruz de bloqueo en diodo si inverso -->
-                            ${vAplicado < 0 ? `
-                                <g transform="translate(430, 100)">
-                                    <line x1="-18" y1="-18" x2="18" y2="18" stroke="#ef4444" stroke-width="5" />
-                                    <line x1="-18" y1="18" x2="18" y2="-18" stroke="#ef4444" stroke-width="5" />
-                                </g>
-                            ` : ''}
-                        `}
-                        
-                        <!-- Indicadores de unión PN -->
-                        <text x="380" y="140" fill="#475569" font-size="11" text-anchor="middle">UNIÓN PN</text>
-                        <text x="395" y="155" fill="#3b82f6" font-size="10" text-anchor="middle">(N) --- (P)</text>
+
+                        <!-- Marcador para flecha -->
+                        <defs>
+                            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/>
+                            </marker>
+                        </defs>
                     </svg>
-                `;
+                </div>
+            </div>
+        </section>
+
+        <!-- Módulo 2: Configuración de Baterías -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div class="space-y-1">
+                    <span class="text-xs font-bold text-blue-500 uppercase tracking-widest">Módulo 2</span>
+                    <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid fa-battery-three-quarters text-emerald-400"></i> Baterías en Serie vs. Paralelo
+                    </h3>
+                </div>
+                <!-- Pestañas para elegir modo -->
+                <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 self-start">
+                    <button onclick="setBatteryConfig('single')" id="btn-single" class="px-4 py-2 text-xs font-bold rounded-lg transition-all duration-300 bg-blue-600 text-white">
+                        1 Batería (1.5 V)
+                    </button>
+                    <button onclick="setBatteryConfig('series')" id="btn-series" class="px-4 py-2 text-xs font-bold rounded-lg transition-all duration-300 text-slate-400 hover:text-slate-100">
+                        En Serie (3.0 V)
+                    </button>
+                    <button onclick="setBatteryConfig('parallel')" id="btn-parallel" class="px-4 py-2 text-xs font-bold rounded-lg transition-all duration-300 text-slate-400 hover:text-slate-100">
+                        En Paralelo (1.5 V)
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Simulación Eléctrica de Circuito de Baterías -->
+                <div class="lg:col-span-8 bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col items-center justify-center relative min-h-[350px]">
+                    <!-- Indicación de electrones -->
+                    <div class="absolute top-4 left-4 bg-slate-900/90 text-[11px] border border-slate-800 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 bg-cyan-400 rounded-full inline-block animate-ping"></span>
+                        <span class="text-slate-300 font-medium">Partículas celestes: <strong class="text-cyan-400">Electrones (-)</strong></span>
+                    </div>
+
+                    <svg id="circuit-svg" viewBox="0 0 600 300" class="w-full max-w-xl h-auto overflow-visible">
+                        <!-- Cableado General -->
+                        <!-- En función de la configuración seleccionada se activan trayectorias -->
+                        <path id="wire-main" d="M 100 150 L 100 50 L 500 50 L 500 150 M 500 150 L 500 250 L 100 250 L 100 150" fill="none" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+                        
+                        <!-- Flujo de electrones animados -->
+                        <path id="electron-path" d="M 100 150 L 100 50 L 500 50 L 500 150 L 500 250 L 100 250 L 100 150" fill="none" stroke="#22d3ee" stroke-width="3" class="electron-flow" stroke-linecap="round" opacity="0.8"/>
+
+                        <!-- BATERÍA 1 -->
+                        <g id="battery1-group" transform="translate(150, 225)">
+                            <rect x="0" y="0" width="80" height="50" rx="4" fill="#1e293b" stroke="#059669" stroke-width="3"/>
+                            <!-- Extremo positivo -->
+                            <rect x="80" y="15" width="8" height="20" rx="2" fill="#d1fae5"/>
+                            <text x="15" y="30" fill="#059669" font-weight="extrabold" font-size="20">-</text>
+                            <text x="65" y="30" fill="#059669" font-weight="extrabold" font-size="18">+</text>
+                            <text x="32" y="30" fill="#ffffff" font-weight="semibold" font-size="11">1.5V</text>
+                        </g>
+
+                        <!-- BATERÍA 2 (Serie/Paralelo dinámica) -->
+                        <g id="battery2-group" transform="translate(270, 225)">
+                            <rect x="0" y="0" width="80" height="50" rx="4" fill="#1e293b" stroke="#059669" stroke-width="3"/>
+                            <!-- Extremo positivo -->
+                            <rect x="80" y="15" width="8" height="20" rx="2" fill="#d1fae5"/>
+                            <text x="15" y="30" fill="#059669" font-weight="extrabold" font-size="20">-</text>
+                            <text x="65" y="30" fill="#059669" font-weight="extrabold" font-size="18">+</text>
+                            <text x="32" y="30" fill="#ffffff" font-weight="semibold" font-size="11">1.5V</text>
+                        </g>
+
+                        <!-- Conectores del circuito según modo -->
+                        <!-- Los ID de cables auxiliares se controlarán por JS -->
+                        <path id="wire-series-bridge" d="M 238 250 L 270 250" stroke="#059669" stroke-width="4" opacity="0"/>
+                        <path id="wire-parallel-bridge1" d="M 150 250 L 150 280 L 310 280" fill="none" stroke="#059669" stroke-width="4" opacity="0"/>
+                        
+                        <!-- Carga (Bombilla) -->
+                        <g id="bulb-group" transform="translate(500, 150)">
+                            <!-- Zócalo de bombilla -->
+                            <rect x="-15" y="0" width="30" height="20" fill="#64748b" stroke="#475569" stroke-width="2"/>
+                            <!-- Globo de vidrio -->
+                            <circle id="bulb-glass" cx="0" cy="-25" r="22" fill="#f59e0b" fill-opacity="0.3" stroke="#f59e0b" stroke-width="2"/>
+                            <!-- Filamento -->
+                            <path d="M -8 0 L -4 -20 L 4 -20 L 8 0" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+                            <!-- Brillo radiante -->
+                            <circle id="bulb-glow" cx="0" cy="-25" r="35" fill="#fbbf24" fill-opacity="0.1" class="transition-all duration-300 pointer-events-none"/>
+                        </g>
+
+                        <!-- Multímetro midiendo en paralelo -->
+                        <g id="multimeter-draw" transform="translate(300, 45)">
+                            <!-- Cuerpo del multímetro -->
+                            <rect x="0" y="0" width="100" height="65" rx="8" fill="#f97316" stroke="#c2410c" stroke-width="3"/>
+                            <!-- Pantalla -->
+                            <rect x="10" y="10" width="80" height="25" rx="3" fill="#020617"/>
+                            <text id="multimeter-val" x="50" y="28" fill="#22d3ee" font-family="monospace" font-weight="bold" font-size="16" text-anchor="middle">1.50 V</text>
+                            <!-- Etiquetas del multímetro -->
+                            <text x="50" y="52" fill="#ffffff" font-size="8" text-anchor="middle">VOLTÍMETRO</text>
+                            <!-- Cables de prueba -->
+                            <path d="M 15 65 L 15 110 L 100 110" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="3 3"/> <!-- Cable positivo rojo -->
+                            <path d="M 85 65 L 85 110 L 500 110" fill="none" stroke="#111827" stroke-width="2" stroke-dasharray="3 3"/> <!-- Cable negativo negro -->
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Explicación Técnica y Métricas -->
+                <div class="lg:col-span-4 bg-slate-950/60 p-5 rounded-xl border border-slate-800/80 flex flex-col justify-between space-y-4">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
+                            <span id="badge-config" class="bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-md text-xs font-bold border border-blue-500/20">Configuración Única</span>
+                        </div>
+                        
+                        <div class="space-y-2 text-xs text-slate-300 leading-relaxed">
+                            <p class="font-semibold text-slate-100 flex items-center gap-1">
+                                <i class="fa-solid fa-calculator text-emerald-400"></i> Comportamiento Eléctrico:
+                            </p>
+                            <p id="battery-behavior-text">
+                                Con una sola batería de 1.5 V, los electrones son empujados a través del circuito a velocidad normal. La bombilla se ilumina con un brillo estándar.
+                            </p>
+                        </div>
+
+                        <div class="p-4 bg-slate-900/50 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-2">
+                            <div class="flex justify-between">
+                                <span>Voltaje Total:</span>
+                                <span id="v-total-stat" class="font-semibold text-slate-200">1.5 V</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Velocidad Electrones:</span>
+                                <span id="v-speed-stat" class="font-semibold text-slate-200">Normal</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Duración de Batería:</span>
+                                <span id="v-duration-stat" class="font-semibold text-slate-200">Estándar</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 bg-slate-900/80 p-3.5 rounded-lg border border-slate-800/80 text-xs text-amber-300 flex items-start gap-2.5">
+                        <i class="fa-solid fa-triangle-exclamation text-base mt-0.5"></i>
+                        <p id="safety-warning">
+                            <strong>Dato Curioso:</strong> Colocar baterías en serie suma la presión (fuerza). Si pones demasiadas baterías en serie, el voltaje excederá la tolerancia del filamento y se quemará.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Módulo 3: Cargas en Serie vs. Paralelo (Caída de Tensión) -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div class="space-y-1">
+                    <span class="text-xs font-bold text-blue-500 uppercase tracking-widest">Módulo 3</span>
+                    <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid fa-diagram-project text-indigo-400"></i> Caída de Tensión (Cargas)
+                    </h3>
+                </div>
+                <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 self-start">
+                    <button onclick="setLoadConfig('series')" id="btn-load-series" class="px-4 py-2 text-xs font-bold rounded-lg transition-all duration-300 bg-blue-600 text-white">
+                        Bombillas en Serie
+                    </button>
+                    <button onclick="setLoadConfig('parallel')" id="btn-load-parallel" class="px-4 py-2 text-xs font-bold rounded-lg transition-all duration-300 text-slate-400 hover:text-slate-100">
+                        Bombillas en Paralelo
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Explicación teórica de la caída de tensión -->
+                <div class="lg:col-span-4 bg-slate-950/60 p-5 rounded-xl border border-slate-800/80 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <h4 class="font-bold text-sm text-slate-200">División del Voltaje</h4>
+                        <p id="load-theory-text" class="text-xs text-slate-300 leading-relaxed">
+                            Al conectar dos bombillas en <strong>Serie</strong>, la presión total de la fuente (3.0 V) debe dividirse a partes iguales entre ellas. Cada bombilla solo recibe 1.5 V, por lo que su brillo es muy débil.
+                        </p>
+                        
+                        <div class="bg-slate-900/60 p-3.5 rounded-lg border border-slate-800 text-xs space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Voltaje Entrada:</span>
+                                <span class="font-semibold text-slate-200">3.0 V</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Voltaje por Bombilla:</span>
+                                <span id="val-per-bulb" class="font-semibold text-indigo-400">1.5 V</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Corriente Total del Circuito:</span>
+                                <span id="val-curr-circuit" class="font-semibold text-emerald-400">0.5 A</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 p-4 rounded-lg border border-slate-800 text-xs text-slate-300">
+                        <strong class="text-slate-100 flex items-center gap-1.5 mb-1.5">
+                            <i class="fa-solid fa-key text-yellow-400"></i> ¿Por qué ocurre esto?
+                        </strong>
+                        <p id="load-key-explanation">
+                            En un circuito en serie, los electrones experimentan "dos peajes" sucesivos. Toda la presión (voltaje) se gasta a lo largo del camino para empujar la corriente de regreso a la batería.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Simulación Visual de Cargas -->
+                <div class="lg:col-span-8 bg-slate-950 p-4 rounded-xl border border-slate-800 flex items-center justify-center min-h-[300px]">
+                    <svg id="load-svg" viewBox="0 0 600 280" class="w-full max-w-xl h-auto overflow-visible">
+                        <!-- Fuente de Alimentación de 3.0V (Baterías estáticas) -->
+                        <g transform="translate(40, 115)">
+                            <rect x="0" y="0" width="60" height="35" rx="3" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                            <rect x="60" y="10" width="5" height="15" rx="1" fill="#cbd5e1"/>
+                            <text x="18" y="22" fill="#94a3b8" font-size="9" font-weight="bold">BATERÍA</text>
+                            <text x="22" y="32" fill="#ef4444" font-size="9" font-weight="bold">3.0V</text>
+                        </g>
+
+                        <!-- Cableado Base -->
+                        <path id="load-wires" d="M 105 132 L 200 132 M 450 132 L 520 132 M 520 132 L 520 230 L 40 230 L 40 150" fill="none" stroke="#475569" stroke-width="3"/>
+                        
+                        <!-- Flujo de electrones animados -->
+                        <path id="load-electron-path" d="M 105 132 L 200 132 M 450 132 L 520 132 M 520 132 L 520 230 L 40 230 L 40 150" fill="none" stroke="#6366f1" stroke-width="2" class="electron-flow" stroke-linecap="round" opacity="0.8"/>
+
+                        <!-- BOMBILLA 1 -->
+                        <g id="load-bulb1" transform="translate(240, 132)">
+                            <rect x="-10" y="0" width="20" height="15" fill="#475569" stroke="#334155"/>
+                            <circle id="l-bulb1-glass" cx="0" cy="-20" r="18" fill="#f59e0b" fill-opacity="0.3" stroke="#f59e0b" stroke-width="2"/>
+                            <circle id="l-bulb1-glow" cx="0" cy="-20" r="28" fill="#f59e0b" fill-opacity="0.08" class="pointer-events-none"/>
+                        </g>
+
+                        <!-- BOMBILLA 2 -->
+                        <g id="load-bulb2" transform="translate(380, 132)">
+                            <rect x="-10" y="0" width="20" height="15" fill="#475569" stroke="#334155"/>
+                            <circle id="l-bulb2-glass" cx="0" cy="-20" r="18" fill="#f59e0b" fill-opacity="0.3" stroke="#f59e0b" stroke-width="2"/>
+                            <circle id="l-bulb2-glow" cx="0" cy="-20" r="28" fill="#f59e0b" fill-opacity="0.08" class="pointer-events-none"/>
+                        </g>
+
+                        <!-- Conectores Serie vs Paralelo -->
+                        <path id="load-bridge-wire" d="M 250 132 L 370 132" stroke="#475569" stroke-width="3" fill="none"/>
+                        <path id="load-parallel-wire1" d="M 200 132 L 200 80 L 410 80 L 410 132" stroke="#475569" stroke-width="3" fill="none" opacity="0"/>
+                        <path id="load-parallel-wire2" d="M 250 132 L 250 180 L 450 180 M 370 132 L 370 180" stroke="#475569" stroke-width="3" fill="none" opacity="0"/>
+
+                        <!-- Multímetros de Diagnóstico (Lecturas en tiempo real) -->
+                        <g transform="translate(200, 15)">
+                            <rect x="0" y="0" width="70" height="35" rx="5" fill="#0f172a" stroke="#4f46e5" stroke-width="2"/>
+                            <text id="v-meter1-val" x="35" y="22" fill="#818cf8" font-family="monospace" font-weight="bold" font-size="12" text-anchor="middle">1.5 V</text>
+                            <text x="35" y="31" fill="#94a3b8" font-size="6" text-anchor="middle">V_CAÍDA 1</text>
+                        </g>
+
+                        <g transform="translate(340, 15)">
+                            <rect x="0" y="0" width="70" height="35" rx="5" fill="#0f172a" stroke="#4f46e5" stroke-width="2"/>
+                            <text id="v-meter2-val" x="35" y="22" fill="#818cf8" font-family="monospace" font-weight="bold" font-size="12" text-anchor="middle">1.5 V</text>
+                            <text x="35" y="31" fill="#94a3b8" font-size="6" text-anchor="middle">V_CAÍDA 2</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Módulo 4: Osciloscopio Interactivo AC vs DC -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div class="space-y-1">
+                    <span class="text-xs font-bold text-blue-500 uppercase tracking-widest">Módulo 4</span>
+                    <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid fa-wave-square text-violet-400"></i> Visualizador AC vs. DC (Osciloscopio)
+                    </h3>
+                </div>
+                <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 self-start">
+                    <button onclick="setWaveType('DC')" id="btn-wave-dc" class="px-4 py-2 text-xs font-bold rounded-lg transition-all duration-300 bg-blue-600 text-white">
+                        Corriente Continua (DC)
+                    </button>
+                    <button onclick="setWaveType('AC')" id="btn-wave-ac" class="px-4 py-2 text-xs font-bold rounded-lg transition-all duration-300 text-slate-400 hover:text-slate-100">
+                        Corriente Alterna (AC)
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Ajustes -->
+                <div class="lg:col-span-4 bg-slate-950/60 p-5 rounded-xl border border-slate-800/80 flex flex-col justify-between space-y-4">
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-sm text-slate-200">Parámetros de la Onda</h4>
+                        
+                        <!-- Amplitud -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs text-slate-400">
+                                <span>Voltaje Máximo (Amplitud)</span>
+                                <span id="scope-amp-val" class="text-violet-400 font-bold">12 V</span>
+                            </div>
+                            <input id="scope-amp" type="range" min="1" max="24" value="12" class="w-full accent-violet-500 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
+                        </div>
+
+                        <!-- Frecuencia -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs text-slate-400">
+                                <span>Frecuencia (Hz)</span>
+                                <span id="scope-freq-val" class="text-violet-400 font-bold">2 Hz</span>
+                            </div>
+                            <input id="scope-freq" type="range" min="1" max="10" value="2" class="w-full accent-violet-500 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
+                        </div>
+
+                        <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800 text-xs text-slate-300 leading-relaxed space-y-2">
+                            <p class="font-semibold text-slate-100 flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-info text-blue-400"></i> ¿Cuál es la diferencia?
+                            </p>
+                            <p id="scope-explanation-text">
+                                La <strong>Corriente Continua (DC)</strong> tiene una polaridad constante. Los electrones fluyen siempre en una sola dirección, lo que genera una línea recta y plana en el osciloscopio. Es la energía que entregan las baterías y cargadores.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Botón de Pausa/Play -->
+                    <button id="scope-pause-btn" onclick="toggleScopeAnimation()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs py-2 rounded-lg border border-slate-700 transition flex items-center justify-center gap-1.5">
+                        <i id="scope-pause-icon" class="fa-solid fa-pause"></i> <span id="scope-pause-text">Pausar Osciloscopio</span>
+                    </button>
+                </div>
+
+                <!-- Canvas de simulación de osciloscopio -->
+                <div class="lg:col-span-8 bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col items-center justify-center relative">
+                    <div class="absolute top-4 left-4 bg-slate-900/90 text-[10px] text-emerald-400 font-mono border border-emerald-950 px-2.5 py-1 rounded">
+                        TRIG'D - AUTO [LIVE]
+                    </div>
+                    <canvas id="scopeCanvas" class="w-full h-[280px] bg-[#022c22] rounded-lg border border-emerald-900/50 shadow-inner"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Módulo 5: Entrenamiento Práctico con el Multímetro -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div class="space-y-1">
+                    <span class="text-xs font-bold text-blue-500 uppercase tracking-widest">Módulo 5</span>
+                    <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid fa-hand-pointer text-amber-400"></i> Entrenamiento: Medición de Tensión
+                    </h3>
+                </div>
+                <p class="text-xs text-slate-400 max-w-md">
+                    Para medir el voltaje, el multímetro debe estar conectado en **paralelo** con la carga y ajustado a la función correcta (AC o DC V).
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Simulación del multímetro y circuito físico -->
+                <div class="lg:col-span-8 bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col items-center justify-center relative min-h-[350px]">
+                    <div class="absolute top-4 left-4 bg-slate-900/90 text-xs text-slate-300 border border-slate-800 px-3 py-1.5 rounded-lg">
+                        📌 Haz clic en los **Bornes circulares** para colocar las sondas.
+                    </div>
+
+                    <svg id="meter-training-svg" viewBox="0 0 600 300" class="w-full max-w-xl h-auto overflow-visible">
+                        <!-- Circuito Eléctrico con tres puntos de prueba -->
+                        <!-- Fuente 12V DC -->
+                        <g transform="translate(50, 180)">
+                            <rect x="0" y="0" width="50" height="70" rx="4" fill="#1e293b" stroke="#ef4444" stroke-width="2"/>
+                            <text x="12" y="30" fill="#ef4444" font-weight="bold" font-size="14">12V</text>
+                            <text x="14" y="50" fill="#cbd5e1" font-size="10">FUENTE</text>
+                        </g>
+
+                        <!-- Cableado básico -->
+                        <path d="M 100 215 L 200 215 M 320 215 L 420 215 L 420 270 L 50 270 L 50 250" fill="none" stroke="#475569" stroke-width="3"/>
+                        <path d="M 200 215 L 320 215" stroke="#475569" stroke-width="3"/>
+
+                        <!-- Resistencia 1 (Carga) -->
+                        <g transform="translate(200, 205)">
+                            <rect x="0" y="0" width="120" height="20" rx="2" fill="#d97706" stroke="#b45309" stroke-width="2"/>
+                            <!-- Bandas de colores de la resistencia -->
+                            <rect x="20" y="0" width="8" height="20" fill="#78350f"/>
+                            <rect x="40" y="0" width="8" height="20" fill="#dc2626"/>
+                            <rect x="60" y="0" width="8" height="20" fill="#eab308"/>
+                            <text x="35" y="-10" fill="#ffffff" font-size="10" font-weight="bold">Resistencia (10k)</text>
+                        </g>
+
+                        <!-- Bornes / Terminales de prueba interactivos -->
+                        <!-- TP1 (Positivo de Fuente) -->
+                        <circle id="tp-a" onclick="connectProbe('A')" cx="100" cy="215" r="12" fill="#ef4444" fill-opacity="0.3" stroke="#ef4444" stroke-width="2" class="cursor-pointer hover:fill-opacity-80 transition-all"/>
+                        <text x="100" y="219" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" class="pointer-events-none">A</text>
+
+                        <!-- TP2 (Entre Fuente y Resistencia) -->
+                        <circle id="tp-b" onclick="connectProbe('B')" cx="200" cy="215" r="12" fill="#ef4444" fill-opacity="0.3" stroke="#ef4444" stroke-width="2" class="cursor-pointer hover:fill-opacity-80 transition-all"/>
+                        <text x="200" y="219" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" class="pointer-events-none">B</text>
+
+                        <!-- TP3 (Negativo/Masa) -->
+                        <circle id="tp-c" onclick="connectProbe('C')" cx="320" cy="215" r="12" fill="#1e293b" fill-opacity="0.8" stroke="#475569" stroke-width="2" class="cursor-pointer hover:fill-opacity-80 transition-all"/>
+                        <text x="320" y="219" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" class="pointer-events-none">C</text>
+
+                        <!-- Dibujo del Multímetro con Display Digital -->
+                        <g id="practical-multimeter" transform="translate(180, 40)">
+                            <!-- Cuerpo -->
+                            <rect x="0" y="0" width="160" height="120" rx="12" fill="#fb7185" stroke="#e11d48" stroke-width="4"/>
+                            <!-- Pantalla -->
+                            <rect x="15" y="15" width="130" height="40" rx="4" fill="#020617"/>
+                            <text id="trainer-display" x="80" y="42" fill="#34d399" font-family="monospace" font-weight="bold" font-size="22" text-anchor="middle">0.00 V</text>
+                            
+                            <!-- Perilla de selección de modo -->
+                            <circle cx="80" cy="85" r="22" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+                            <line id="knob-pointer" x1="80" y1="85" x2="80" y2="67" stroke="#fb7185" stroke-width="4" stroke-linecap="round"/>
+                            
+                            <!-- Etiquetas de la perilla -->
+                            <text x="40" y="88" fill="#ffffff" font-size="9" font-weight="bold">DC V</text>
+                            <text x="120" y="88" fill="#ffffff" font-size="9" font-weight="bold">AC V</text>
+                            <text x="80" y="115" fill="#ffffff" font-size="8" text-anchor="middle">SELECTOR MODO</text>
+                        </g>
+
+                        <!-- Sondas de prueba físicas móviles -->
+                        <!-- Se dibujarán dinámicamente o se reposicionarán con JS en base a los bornes seleccionados -->
+                        <path id="probe-red-line" d="M 210 160 L 210 160" stroke="#f43f5e" stroke-width="3" fill="none" opacity="0"/>
+                        <path id="probe-black-line" d="M 310 160 L 310 160" stroke="#334155" stroke-width="3" fill="none" opacity="0"/>
+                    </svg>
+                </div>
+
+                <!-- Controles del multímetro & resultados -->
+                <div class="lg:col-span-4 bg-slate-950/60 p-5 rounded-xl border border-slate-800/80 flex flex-col justify-between space-y-4">
+                    <div class="space-y-4">
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-sm text-slate-200">Panel de Ajustes</h4>
+                            <p class="text-[11px] text-slate-400">Configura el selector del equipo para coincidir con la naturaleza de tu circuito.</p>
+                        </div>
+
+                        <!-- Selector de modo (Botón interactivo que simula perilla) -->
+                        <div class="space-y-2">
+                            <label class="text-xs text-slate-400 font-semibold block">Selector de Tensión:</label>
+                            <div class="grid grid-cols-2 gap-2 bg-slate-900 p-1 rounded-lg border border-slate-800">
+                                <button onclick="setDialMode('DC')" id="btn-dial-dc" class="py-2 text-xs font-bold rounded bg-rose-600 text-white transition-all">
+                                    Corriente Continua (DC)
+                                </button>
+                                <button onclick="setDialMode('AC')" id="btn-dial-ac" class="py-2 text-xs font-bold rounded text-slate-400 hover:text-slate-200 transition-all">
+                                    Corriente Alterna (AC)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Estado de las puntas -->
+                        <div class="space-y-2.5 bg-slate-900 p-4 rounded-xl border border-slate-800 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Punta Roja (+):</span>
+                                <span id="probe-red-status" class="font-semibold text-rose-400">Suelte en el aire</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Punta Negra (-):</span>
+                                <span id="probe-black-status" class="font-semibold text-slate-400">Suelte en el aire</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-blue-500/5 rounded-lg border border-blue-500/10 text-xs text-blue-300">
+                            <strong>Instrucciones:</strong> 
+                            Para medir el voltaje de la fuente o la caída de tensión en la resistencia, conecta la punta roja en **A** o **B** y la punta negra en **C**.
+                        </div>
+                    </div>
+
+                    <!-- Botón para reiniciar mediciones -->
+                    <button onclick="resetProbes()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl border border-slate-700 text-xs font-medium transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> Reiniciar Sondas
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Módulo 6: Examen interactivo de Comprensión -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+            <div class="border-b border-slate-800 pb-4">
+                <span class="text-xs font-bold text-blue-500 uppercase tracking-widest">Módulo 6</span>
+                <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question text-emerald-400"></i> Pon a Prueba tu Conocimiento
+                </h3>
+            </div>
+
+            <!-- Interfaz de la trivia -->
+            <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 max-w-3xl mx-auto space-y-6">
+                <!-- Barra de progreso -->
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs text-slate-400">
+                        <span id="quiz-progress-lbl">Pregunta 1 de 5</span>
+                        <span id="quiz-score-lbl" class="text-emerald-400 font-bold">Puntuación: 0%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div id="quiz-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 20%;"></div>
+                    </div>
+                </div>
+
+                <!-- Pregunta -->
+                <div class="space-y-4">
+                    <h4 id="quiz-question" class="text-base sm:text-lg font-bold text-slate-100 leading-tight">
+                        ¿Qué es exactamente el voltaje de acuerdo con el video?
+                    </h4>
+                    
+                    <!-- Opciones de respuesta -->
+                    <div class="grid grid-cols-1 gap-3" id="quiz-options">
+                        <!-- Botones de opción inyectados dinámicamente por JS -->
+                    </div>
+                </div>
+
+                <!-- Mensaje de retroalimentación -->
+                <div id="quiz-feedback" class="hidden p-4 rounded-xl border text-xs leading-relaxed space-y-2">
+                    <p class="font-bold" id="feedback-title"></p>
+                    <p id="feedback-desc"></p>
+                </div>
+
+                <!-- Botón de siguiente -->
+                <button id="quiz-next-btn" onclick="nextQuestion()" class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-blue-900/30">
+                    Siguiente Pregunta <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t border-slate-800 py-8 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 space-y-3">
+            <p>Simulador interactivo construido basado en las enseñanzas de <strong>Mentalidad De Ingeniería</strong>.</p>
+            <p>© 2026 Laboratorio Eléctrico Educativo. Diseñado para un aprendizaje dinámico y práctico.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts Interactivos -->
+    <script>
+        // --- VARIABLES DE ESTADO GLOBAL ---
+        let selectedBatteryConfig = 'single';
+        let selectedLoadConfig = 'series';
+        let waveType = 'DC';
+        let isScopeRunning = true;
+        let selectedDialMode = 'DC';
+        let probeRed = null; // Puede ser 'A', 'B', 'C' o null
+        let probeBlack = null; // Puede ser 'A', 'B', 'C' o null
+
+        // --- MÓDULO 1: SIMULACIÓN DE AGUA (ANALOGÍA) ---
+        const lakeHeightInput = document.getElementById('lake-height');
+        const heightValText = document.getElementById('height-val');
+        const pVoltText = document.getElementById('p-volt');
+        const pAmpText = document.getElementById('p-amp');
+        const waterExplanation = document.getElementById('water-explanation');
+
+        // SVG Elements
+        const waterLeft = document.getElementById('water-left');
+        const waterStream = document.getElementById('water-stream');
+        const heightArrow = document.getElementById('height-arrow');
+        const heightText = document.getElementById('height-text');
+        const cityLight = document.getElementById('city-light');
+        const lightRays = document.getElementById('light-rays');
+        const turbineGroup = document.getElementById('turbine-group');
+
+        let turbineAngle = 0;
+        let animationFrameId;
+
+        function updateWaterSimulation() {
+            const h = parseFloat(lakeHeightInput.value);
+            heightValText.textContent = `${h} metros`;
+
+            // Cálculos físicos proporcionales
+            const voltage = h * 1.2; // Voltaje ficticio
+            const resistance = 5.0; // Resistencia constante
+            const current = voltage / resistance;
+
+            pVoltText.textContent = `${voltage.toFixed(1)} V`;
+            pAmpText.textContent = `${current.toFixed(1)} A`;
+
+            // Actualizar visualizaciones del SVG
+            // Lago Superior (agua izquierda)
+            const yPos = 248 - (h * 5);
+            const height = h * 5;
+            waterLeft.setAttribute('y', yPos);
+            waterLeft.setAttribute('height', height + 2);
+
+            // Caída de agua (Flujo)
+            if (h > 0) {
+                waterStream.setAttribute('opacity', '0.8');
+                waterStream.setAttribute('stroke-width', 4 + (current * 4));
+                // Ruta de la cascada
+                waterStream.setAttribute('d', `M 145 ${yPos + 5} C 210 ${yPos + 5}, 210 240, 285 240`);
+            } else {
+                waterStream.setAttribute('opacity', '0');
+            }
+
+            // Flecha indicadora de altura
+            heightArrow.setAttribute('y1', yPos);
+            heightArrow.setAttribute('y2', '248');
+            heightText.setAttribute('y', (yPos + 248) / 2);
+            heightText.textContent = `Δh = ${h}m`;
+
+            // Brillo de la ciudad según la potencia generada
+            const power = voltage * current;
+            const glowIntensity = Math.min(power / 10, 1.0);
+            cityLight.setAttribute('fill-opacity', glowIntensity);
+            cityLight.setAttribute('filter', `drop-shadow(0px 0px ${glowIntensity * 16}px rgba(245,158,11,0.8))`);
+            lightRays.setAttribute('opacity', glowIntensity);
+
+            // Explicaciones dinámicas
+            if (h === 0) {
+                waterExplanation.innerHTML = `Los lagos están al <strong class="text-amber-400">mismo nivel</strong>. No hay diferencia de potencial, el agua no fluye y la turbina no genera energía para iluminar la ciudad. En un circuito, esto representa una batería completamente descargada de 0V.`;
+            } else if (h < 8) {
+                waterExplanation.innerHTML = `La diferencia de altura es <strong class="text-cyan-400">baja</strong>. Hay poca presión de agua (bajo voltaje), lo que produce un flujo lento (baja corriente). La turbina gira lentamente y la luz de la ciudad es muy tenue.`;
+            } else {
+                waterExplanation.innerHTML = `¡Excelente! Una <strong class="text-emerald-400">gran diferencia de potencial (voltaje)</strong> genera una alta presión. El agua se mueve con fuerza, haciendo girar la turbina a toda velocidad para alimentar de energía limpia a toda la ciudad.`;
+            }
+        }
+
+        // Animación de giro de la turbina
+        function animateTurbine() {
+            const h = parseFloat(lakeHeightInput.value);
+            if (h > 0) {
+                const speed = (h * 1.5); // Velocidad de giro proporcional a la altura
+                turbineAngle = (turbineAngle + speed) % 360;
+                turbineGroup.setAttribute('transform', `translate(210, 195) rotate(${turbineAngle})`);
+            }
+            animationFrameId = requestAnimationFrame(animateTurbine);
+        }
+
+        lakeHeightInput.addEventListener('input', updateWaterSimulation);
+        updateWaterSimulation();
+        animateTurbine();
+
+        // --- STREAMING_CHUNK: MÓDULO 2: BATERÍAS EN DETALLE ---
+        const b1Group = document.getElementById('battery1-group');
+        const b2Group = document.getElementById('battery2-group');
+        const wireSeriesBridge = document.getElementById('wire-series-bridge');
+        const wireParallelBridge1 = document.getElementById('wire-parallel-bridge1');
+        const bulbGlow = document.getElementById('bulb-glow');
+        const bulbGlass = document.getElementById('bulb-glass');
+        const multimeterVal = document.getElementById('multimeter-val');
+        const electronFlow = document.getElementById('electron-path');
+
+        // Estados e indicadores de batería
+        const badgeConfig = document.getElementById('badge-config');
+        const batteryBehaviorText = document.getElementById('battery-behavior-text');
+        const vTotalStat = document.getElementById('v-total-stat');
+        const vSpeedStat = document.getElementById('v-speed-stat');
+        const vDurationStat = document.getElementById('v-duration-stat');
+
+        function setBatteryConfig(mode) {
+            selectedBatteryConfig = mode;
+            
+            // Actualizar botones de pestañas
+            ['single', 'series', 'parallel'].forEach(m => {
+                const btn = document.getElementById(`btn-${m}`);
+                if (m === mode) {
+                    btn.classList.add('bg-blue-600', 'text-white');
+                    btn.classList.remove('text-slate-400', 'hover:text-slate-100');
+                } else {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('text-slate-400', 'hover:text-slate-100');
+                }
+            });
+
+            // Lógica de visualización de batería y circuito en el SVG
+            if (mode === 'single') {
+                b2Group.setAttribute('opacity', '0.2');
+                wireSeriesBridge.setAttribute('opacity', '0');
+                wireParallelBridge1.setAttribute('opacity', '0');
                 
-                svgContainer.innerHTML = svgHtml;
+                // Valores eléctricos
+                multimeterVal.textContent = '1.50 V';
+                vTotalStat.textContent = '1.5 V';
+                vSpeedStat.textContent = 'Normal';
+                vDurationStat.textContent = 'Estándar';
+
+                // Brillo de bombilla
+                bulbGlass.setAttribute('fill-opacity', '0.4');
+                bulbGlow.setAttribute('fill-opacity', '0.15');
+                bulbGlow.setAttribute('r', '35');
+
+                // Movimiento electrones
+                electronFlow.style.animationDuration = '1.5s';
+
+                badgeConfig.textContent = 'Batería Única (1.5V)';
+                badgeConfig.className = 'bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-md text-xs font-bold border border-blue-500/20';
+                batteryBehaviorText.textContent = 'Con una sola batería de 1.5 V, los electrones son empujados a través del circuito a una velocidad normal. La bombilla se ilumina con brillo estándar y durará un tiempo convencional.';
+            } 
+            else if (mode === 'series') {
+                b2Group.setAttribute('opacity', '1');
+                wireSeriesBridge.setAttribute('opacity', '1');
+                wireParallelBridge1.setAttribute('opacity', '0');
+
+                // Reubicar batería 2 para conectarse en serie (Suma voltajes)
+                b2Group.setAttribute('transform', 'translate(238, 225)');
+
+                // Valores eléctricos
+                multimeterVal.textContent = '3.00 V';
+                vTotalStat.textContent = '3.0 V (¡Se duplica!)';
+                vSpeedStat.textContent = 'Muy Veloz';
+                vDurationStat.textContent = 'Corta (Doble consumo)';
+
+                // Brillo de bombilla (Más brillante)
+                bulbGlass.setAttribute('fill-opacity', '0.9');
+                bulbGlow.setAttribute('fill-opacity', '0.45');
+                bulbGlow.setAttribute('r', '55');
+
+                // Movimiento electrones (Más veloz por mayor presión)
+                electronFlow.style.animationDuration = '0.6s';
+
+                badgeConfig.textContent = 'Conexión en Serie (3.0V)';
+                badgeConfig.className = 'bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-md text-xs font-bold border border-amber-500/20';
+                batteryBehaviorText.textContent = '¡La presión se duplica! Al conectar el borne positivo de una batería al negativo de la otra, las fuerzas se suman. Los electrones fluyen al doble de velocidad, generando un brillo espectacular, pero consumiendo la carga más rápido.';
+            } 
+            else if (mode === 'parallel') {
+                b2Group.setAttribute('opacity', '1');
+                wireSeriesBridge.setAttribute('opacity', '0');
+                wireParallelBridge1.setAttribute('opacity', '1');
+
+                // Reubicar batería 2 arriba de la primera para conexión en paralelo
+                b2Group.setAttribute('transform', 'translate(150, 160)');
+
+                // Valores eléctricos
+                multimeterVal.textContent = '1.50 V';
+                vTotalStat.textContent = '1.5 V (Igual)';
+                vSpeedStat.textContent = 'Normal';
+                vDurationStat.textContent = 'Larga (Se comparte el trabajo)';
+
+                // Brillo de bombilla
+                bulbGlass.setAttribute('fill-opacity', '0.4');
+                bulbGlow.setAttribute('fill-opacity', '0.15');
+                bulbGlow.setAttribute('r', '35');
+
+                // Movimiento electrones
+                electronFlow.style.animationDuration = '1.5s';
+
+                badgeConfig.textContent = 'Conexión en Paralelo (1.5V)';
+                badgeConfig.className = 'bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-md text-xs font-bold border border-emerald-500/20';
+                batteryBehaviorText.textContent = 'Al conectar positivos con positivos y negativos con negativos, el voltaje total no se incrementa (sigue siendo 1.5V). Sin embargo, el esfuerzo de trabajo se reparte entre ambas baterías, durando el doble de tiempo.';
             }
-            
-            // Eventos
-            function actualizarDesdeSlider() {
-                voltajeAplicado = parseFloat(slider.value);
-                actualizarSimulador();
+        }
+
+        // Inicializar
+        setBatteryConfig('single');
+
+        // --- STREAMING_CHUNK: MÓDULO 3: CAÍDA DE TENSIÓN DE CARGAS ---
+        const loadBulb1Glass = document.getElementById('l-bulb1-glass');
+        const loadBulb1Glow = document.getElementById('l-bulb1-glow');
+        const loadBulb2Glass = document.getElementById('l-bulb2-glass');
+        const loadBulb2Glow = document.getElementById('l-bulb2-glow');
+        const loadBridgeWire = document.getElementById('load-bridge-wire');
+        const loadParallelWire1 = document.getElementById('load-parallel-wire1');
+        const loadParallelWire2 = document.getElementById('load-parallel-wire2');
+        const vMeter1 = document.getElementById('v-meter1-val');
+        const vMeter2 = document.getElementById('v-meter2-val');
+        const loadElectronFlow = document.getElementById('load-electron-path');
+
+        const loadTheoryText = document.getElementById('load-theory-text');
+        const loadKeyExplanation = document.getElementById('load-key-explanation');
+        const valPerBulb = document.getElementById('val-per-bulb');
+        const valCurrCircuit = document.getElementById('val-curr-circuit');
+
+        function setLoadConfig(mode) {
+            selectedLoadConfig = mode;
+
+            // Actualizar botones de pestañas
+            ['series', 'parallel'].forEach(m => {
+                const btn = document.getElementById(`btn-load-${m}`);
+                if (m === mode) {
+                    btn.classList.add('bg-blue-600', 'text-white');
+                    btn.classList.remove('text-slate-400', 'hover:text-slate-100');
+                } else {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('text-slate-400', 'hover:text-slate-100');
+                }
+            });
+
+            if (mode === 'series') {
+                // Modificar conexiones visuales
+                loadBridgeWire.setAttribute('opacity', '1');
+                loadParallelWire1.setAttribute('opacity', '0');
+                loadParallelWire2.setAttribute('opacity', '0');
+
+                // Cálculos de caída de tensión
+                vMeter1.textContent = '1.50 V';
+                vMeter2.textContent = '1.50 V';
+                valPerBulb.textContent = '1.5 V';
+                valCurrCircuit.textContent = '0.5 A';
+
+                // Bombillas tenues (1.5V de caída para cada una)
+                loadBulb1Glass.setAttribute('fill-opacity', '0.3');
+                loadBulb1Glow.setAttribute('fill-opacity', '0.08');
+                loadBulb1Glow.setAttribute('r', '25');
+
+                loadBulb2Glass.setAttribute('fill-opacity', '0.3');
+                loadBulb2Glow.setAttribute('fill-opacity', '0.08');
+                loadBulb2Glow.setAttribute('r', '25');
+
+                // Electrones lentos
+                loadElectronFlow.style.animationDuration = '2.0s';
+
+                loadTheoryText.innerHTML = `Al conectar dos bombillas en <strong>Serie</strong>, la presión total de la fuente (3.0 V) debe dividirse a partes iguales entre ellas. Cada bombilla solo recibe 1.5 V, por lo que su brillo es muy débil.`;
+                loadKeyExplanation.innerHTML = `En un circuito en serie, los electrones experimentan "dos peajes" sucesivos. Toda la presión (voltaje) se gasta a lo largo del camino para empujar la corriente de regreso a la batería.`;
+            } else {
+                // Modificar conexiones visuales (Esquema paralelo)
+                loadBridgeWire.setAttribute('opacity', '0');
+                loadParallelWire1.setAttribute('opacity', '1');
+                loadParallelWire2.setAttribute('opacity', '1');
+
+                // Cálculos de caída de tensión en paralelo
+                vMeter1.textContent = '3.00 V';
+                vMeter2.textContent = '3.00 V';
+                valPerBulb.textContent = '3.0 V (¡Completo!)';
+                valCurrCircuit.textContent = '1.2 A';
+
+                // Ambos brillan con todo su esplendor (3V de caída en cada uno)
+                loadBulb1Glass.setAttribute('fill-opacity', '0.9');
+                loadBulb1Glow.setAttribute('fill-opacity', '0.4');
+                loadBulb1Glow.setAttribute('r', '45');
+
+                loadBulb2Glass.setAttribute('fill-opacity', '0.9');
+                loadBulb2Glow.setAttribute('fill-opacity', '0.4');
+                loadBulb2Glow.setAttribute('r', '45');
+
+                // Electrones rápidos
+                loadElectronFlow.style.animationDuration = '0.8s';
+
+                loadTheoryText.innerHTML = `Al conectar las bombillas en <strong>Paralelo</strong>, cada una tiene su propio camino directo a las terminales de la fuente. Ambas reciben la presión completa de 3.0 V de la batería, iluminando con toda su capacidad.`;
+                loadKeyExplanation.innerHTML = `Esta es la razón por la que en las casas todo se conecta en paralelo. Si usáramos serie, al encender la licuadora el televisor perdería voltaje y se apagaría.`;
             }
-            
-            function cambiarTipoDiodo() {
-                tipoActual = selectDiodo.value;
-                actualizarSimulador();
+        }
+
+        // Inicializar Módulo 3
+        setLoadConfig('series');
+
+        // --- STREAMING_CHUNK: MÓDULO 4: OSCILOSCOPIO INTERACTIVO ---
+        const canvas = document.getElementById('scopeCanvas');
+        const ctx = canvas.getContext('2d');
+        const scopeAmpInput = document.getElementById('scope-amp');
+        const scopeFreqInput = document.getElementById('scope-freq');
+        const scopeAmpVal = document.getElementById('scope-amp-val');
+        const scopeFreqVal = document.getElementById('scope-freq-val');
+        const scopeExplanationText = document.getElementById('scope-explanation-text');
+
+        let xOffset = 0;
+
+        // Ajustar resolución del canvas
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = 280;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function setWaveType(type) {
+            waveType = type;
+
+            // Actualizar botones de pestañas
+            ['dc', 'ac'].forEach(m => {
+                const btn = document.getElementById(`btn-wave-${m}`);
+                if (m === type.toLowerCase()) {
+                    btn.classList.add('bg-blue-600', 'text-white');
+                    btn.classList.remove('text-slate-400', 'hover:text-slate-100');
+                } else {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('text-slate-400', 'hover:text-slate-100');
+                }
+            });
+
+            if (type === 'DC') {
+                scopeExplanationText.innerHTML = `La <strong>Corriente Continua (DC)</strong> tiene una polaridad constante. Los electrones fluyen siempre en una sola dirección, lo que genera una línea recta y plana en el osciloscopio. Es la energía que entregan las baterías y cargadores.`;
+            } else {
+                scopeExplanationText.innerHTML = `La <strong>Corriente Alterna (AC)</strong> cambia periódicamente su dirección y magnitud. Los electrones viajan hacia adelante y hacia atrás siguiendo una onda senoidal. Es la electricidad suministrada por las tomas de corriente de las casas.`;
             }
-            
-            slider.addEventListener('input', actualizarDesdeSlider);
-            selectDiodo.addEventListener('change', cambiarTipoDiodo);
-            
-            // Inicializar
-            actualizarSimulador();
-        })();
+        }
+
+        function drawScope() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerY = height / 2;
+
+            // 1. Dibujar rejilla del osciloscopio
+            ctx.strokeStyle = '#064e3b';
+            ctx.lineWidth = 1;
+
+            // Rejilla Vertical
+            for (let x = 0; x < width; x += 40) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+            }
+            // Rejilla Horizontal
+            for (let y = 0; y < height; y += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+
+            // Eje central de referencia
+            ctx.strokeStyle = '#059669';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(width, centerY);
+            ctx.stroke();
+
+            // 2. Dibujar onda eléctrica
+            const amp = parseFloat(scopeAmpInput.value) * 5; // Multiplicador visual
+            const freq = parseFloat(scopeFreqInput.value) * 0.02;
+
+            scopeAmpVal.textContent = `${scopeAmpInput.value} V`;
+            scopeFreqVal.textContent = `${scopeFreqInput.value} Hz`;
+
+            ctx.strokeStyle = '#22d3ee'; // Cian brillante
+            ctx.shadowColor = '#06b6d4';
+            ctx.shadowBlur = 8;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+
+            if (waveType === 'DC') {
+                // Tensión Continua (Línea plana arriba del eje)
+                const yPos = centerY - amp;
+                ctx.moveTo(0, yPos);
+                ctx.lineTo(width, yPos);
+            } else {
+                // Tensión Alterna (Senoide animada)
+                for (let x = 0; x < width; x++) {
+                    const angle = (x * freq) - xOffset;
+                    const y = centerY - Math.sin(angle) * amp;
+                    if (x === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+            }
+            ctx.stroke();
+            ctx.shadowBlur = 0; // Desactivar sombra para no afectar otras cosas
+
+            // Incrementar desfase para la animación
+            if (isScopeRunning) {
+                xOffset += 0.05;
+            }
+
+            requestAnimationFrame(drawScope);
+        }
+
+        function toggleScopeAnimation() {
+            isScopeRunning = !isScopeRunning;
+            const btnText = document.getElementById('scope-pause-text');
+            const btnIcon = document.getElementById('scope-pause-icon');
+            if (isScopeRunning) {
+                btnText.textContent = "Pausar Osciloscopio";
+                btnIcon.className = "fa-solid fa-pause";
+            } else {
+                btnText.textContent = "Reanudar Osciloscopio";
+                btnIcon.className = "fa-solid fa-play";
+            }
+        }
+
+        // Lanzar osciloscopio
+        drawScope();
+
+        // --- STREAMING_CHUNK: MÓDULO 5: ENTRENAMIENTO DE MULTÍMETRO ---
+        const trainerDisplay = document.getElementById('trainer-display');
+        const probeRedStatus = document.getElementById('probe-red-status');
+        const probeBlackStatus = document.getElementById('probe-black-status');
+        const knobPointer = document.getElementById('knob-pointer');
+
+        // Puntos de SVG de sondas
+        const redLine = document.getElementById('probe-red-line');
+        const blackLine = document.getElementById('probe-black-line');
+
+        // Posiciones físicas de los puntos de prueba (TP)
+        const coords = {
+            'A': { x: 280, y: 255 }, // Coordenadas dentro del SVG del multímetro
+            'B': { x: 380, y: 255 },
+            'C': { x: 500, y: 255 }
+        };
+
+        function setDialMode(mode) {
+            selectedDialMode = mode;
+            ['dc', 'ac'].forEach(m => {
+                const btn = document.getElementById(`btn-dial-${m}`);
+                if (m === mode.toLowerCase()) {
+                    btn.classList.add('bg-rose-600', 'text-white');
+                    btn.classList.remove('text-slate-400', 'hover:text-slate-200');
+                } else {
+                    btn.classList.remove('bg-rose-600', 'text-white');
+                    btn.classList.add('text-slate-400', 'hover:text-slate-200');
+                }
+            });
+
+            // Rotar la perilla visualmente
+            if (mode === 'DC') {
+                knobPointer.setAttribute('transform', 'rotate(-45, 80, 85)');
+            } else {
+                knobPointer.setAttribute('transform', 'rotate(45, 80, 85)');
+            }
+
+            calculateMeterMeasurement();
+        }
+
+        function connectProbe(point) {
+            // Lógica para alternar sondas: primero conecta roja, luego negra
+            if (!probeRed) {
+                probeRed = point;
+                probeRedStatus.textContent = `Conectada en Bornes ${point}`;
+                probeRedStatus.className = 'font-bold text-rose-500';
+                
+                // Efecto visual en el borne
+                document.getElementById(`tp-${point.toLowerCase()}`).setAttribute('fill-opacity', '0.9');
+            } else if (!probeBlack && probeRed !== point) {
+                probeBlack = point;
+                probeBlackStatus.textContent = `Conectada en Bornes ${point}`;
+                probeBlackStatus.className = 'font-bold text-slate-300';
+
+                document.getElementById(`tp-${point.toLowerCase()}`).setAttribute('fill-opacity', '0.9');
+            } else {
+                // Si ambos ya están ocupados, limpia y vuelve a empezar
+                resetProbes();
+                probeRed = point;
+                probeRedStatus.textContent = `Conectada en Bornes ${point}`;
+                probeRedStatus.className = 'font-bold text-rose-500';
+                document.getElementById(`tp-${point.toLowerCase()}`).setAttribute('fill-opacity', '0.9');
+            }
+
+            drawProbes();
+            calculateMeterMeasurement();
+        }
+
+        function drawProbes() {
+            // Línea roja
+            if (probeRed) {
+                const startX = 220; // Orificio del multímetro en el SVG
+                const startY = 160;
+                const endCoord = coords[probeRed];
+                redLine.setAttribute('d', `M ${startX} ${startY} C 150 200, 100 150, ${endCoord.x - 180} ${endCoord.y - 40}`);
+                redLine.setAttribute('opacity', '1');
+            } else {
+                redLine.setAttribute('opacity', '0');
+            }
+
+            // Línea negra
+            if (probeBlack) {
+                const startX = 300;
+                const startY = 160;
+                const endCoord = coords[probeBlack];
+                blackLine.setAttribute('d', `M ${startX} ${startY} C 250 200, 350 200, ${endCoord.x - 180} ${endCoord.y - 40}`);
+                blackLine.setAttribute('opacity', '1');
+            } else {
+                blackLine.setAttribute('opacity', '0');
+            }
+        }
+
+        function calculateMeterMeasurement() {
+            if (!probeRed || !probeBlack) {
+                trainerDisplay.textContent = '0.00 V';
+                return;
+            }
+
+            // El circuito tiene 12V DC.
+            // Si el dial está en AC, marcará 0V ya que la fuente es continua.
+            if (selectedDialMode === 'AC') {
+                trainerDisplay.textContent = '0.00 V';
+                return;
+            }
+
+            // Lógica de diferencias de potencial en DC:
+            // TP_A = 12V, TP_B = 12V (antes de la resistencia, sin caída), TP_C = 0V
+            // Medición entre A y C = 12V
+            // Medición entre B y C = 12V (el circuito está abierto al final de la resistencia, caída nula)
+            // Medición entre A y B = 0V (mismo potencial)
+            let measurement = 0.00;
+
+            if ((probeRed === 'A' && probeBlack === 'C') || (probeRed === 'B' && probeBlack === 'C')) {
+                measurement = 12.00;
+            } else if ((probeRed === 'C' && probeBlack === 'A') || (probeRed === 'C' && probeBlack === 'B')) {
+                measurement = -12.00; // Polaridad invertida
+            } else if (probeRed === probeBlack) {
+                measurement = 0.00;
+            } else {
+                measurement = 0.00; // Entre A y B no hay caída porque están en el mismo cable
+            }
+
+            trainerDisplay.textContent = `${measurement.toFixed(2)} V`;
+        }
+
+        function resetProbes() {
+            probeRed = null;
+            probeBlack = null;
+            probeRedStatus.textContent = 'Suelte en el aire';
+            probeRedStatus.className = 'font-semibold text-rose-400';
+            probeBlackStatus.textContent = 'Suelte en el aire';
+            probeBlackStatus.className = 'font-semibold text-slate-400';
+
+            // Apagar brillo de todos los bornes
+            ['a', 'b', 'c'].forEach(tp => {
+                document.getElementById(`tp-${tp}`).setAttribute('fill-opacity', '0.3');
+            });
+
+            drawProbes();
+            calculateMeterMeasurement();
+        }
+
+        // Inicializar perilla
+        setDialMode('DC');
+
+        // --- STREAMING_CHUNK: EXAMEN DE COMPRENSIÓN (TRIVIA) ---
+        const quizQuestions = [
+            {
+                q: "¿Qué representa el voltaje de acuerdo con la analogía hidráulica vista en el video?",
+                o: [
+                    "La cantidad total de agua que fluye.",
+                    "La diferencia de altura (presión) entre los dos lagos.",
+                    "El tamaño de la turbina que genera trabajo.",
+                    "La resistencia de las tuberías."
+                ],
+                correct: 1,
+                reason: "La altura diferencial crea presión gravitatoria. En electricidad, la diferencia de potencial (voltaje) crea la presión eléctrica que empuja a los electrones libres."
+            },
+            {
+                q: "Si conectas dos baterías de 1.5V en SERIE, ¿cuál es el voltaje total resultante en el circuito?",
+                o: [
+                    "1.5 V (El voltaje permanece igual).",
+                    "0 V (Se anulan entre sí).",
+                    "3.0 V (Los voltajes se suman).",
+                    "4.5 V (Se multiplica por tres)."
+                ],
+                correct: 2,
+                reason: "Al conectar baterías en serie (positivo con negativo), las fuerzas o presiones de ambas se suman, duplicando la tensión total."
+            },
+            {
+                q: "¿Qué ocurre con la duración de la batería si las conectas en PARALELO?",
+                o: [
+                    "Las baterías se agotan al doble de velocidad.",
+                    "La bombilla brillará tanto que se quemará.",
+                    "La duración total de la carga se incrementa (comparten el trabajo).",
+                    "El circuito entra en cortocircuito inmediato."
+                ],
+                correct: 2,
+                reason: "En paralelo, el voltaje sigue siendo 1.5V, pero las baterías se dividen la corriente demandada, por lo que duran mucho más tiempo activas."
+            },
+            {
+                q: "¿Por qué las bombillas en una conexión en serie brillan menos?",
+                o: [
+                    "Porque la corriente viaja en la dirección opuesta.",
+                    "Porque la presión eléctrica (voltaje) se divide entre las cargas.",
+                    "Porque las bombillas en serie se apagan solas.",
+                    "Porque no hay corriente fluyendo en el circuito."
+                ],
+                correct: 1,
+                reason: "En un circuito en serie, la tensión se reparte proporcionalmente entre todas las resistencias. A menor voltaje individual, menor potencia y menor brillo."
+            },
+            {
+                q: "Si enchufas un secador de pelo estadounidense de 110V en un enchufe europeo de 220V, ¿qué pasará?",
+                o: [
+                    "Funcionará de forma normal y segura.",
+                    "Funcionará a la mitad de velocidad.",
+                    "Se quemará debido al exceso de presión eléctrica (voltaje).",
+                    "Se cargará la batería interna del secador."
+                ],
+                correct: 2,
+                reason: "El voltaje europeo es el doble de presión que la tolerancia del aparato de 110V, obligando a pasar demasiada corriente y quemando el embobinado."
+            }
+        ];
+
+        let currentQuizIndex = 0;
+        let score = 0;
+
+        const quizQuestionText = document.getElementById('quiz-question');
+        const quizOptionsContainer = document.getElementById('quiz-options');
+        const quizProgressLbl = document.getElementById('quiz-progress-lbl');
+        const quizScoreLbl = document.getElementById('quiz-score-lbl');
+        const quizBar = document.getElementById('quiz-bar');
+        const quizFeedback = document.getElementById('quiz-feedback');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackDesc = document.getElementById('feedback-desc');
+        const quizNextBtn = document.getElementById('quiz-next-btn');
+
+        function loadQuizQuestion() {
+            const data = quizQuestions[currentQuizIndex];
+            quizQuestionText.textContent = data.q;
+            quizProgressLbl.textContent = `Pregunta ${currentQuizIndex + 1} de ${quizQuestions.length}`;
+            quizBar.style.width = `${((currentQuizIndex + 1) / quizQuestions.length) * 100}%`;
+
+            // Limpiar opciones previas
+            quizOptionsContainer.innerHTML = '';
+            quizFeedback.classList.add('hidden');
+            quizNextBtn.classList.add('hidden');
+
+            // Renderizar nuevas opciones
+            data.o.forEach((option, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800/80 hover:border-slate-700 transition-all text-sm font-medium text-slate-300 flex justify-between items-center";
+                btn.innerHTML = `<span>${option}</span> <i class="fa-regular fa-circle text-slate-600"></i>`;
+                btn.onclick = () => selectQuizOption(idx, btn);
+                quizOptionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectQuizOption(selectedIdx, clickedBtn) {
+            const data = quizQuestions[currentQuizIndex];
+            const allButtons = quizOptionsContainer.querySelectorAll('button');
+
+            // Deshabilitar clics adicionales
+            allButtons.forEach(btn => btn.disabled = true);
+
+            quizFeedback.classList.remove('hidden');
+            quizNextBtn.classList.remove('hidden');
+
+            if (selectedIdx === data.correct) {
+                // Correcto
+                score++;
+                clickedBtn.className = "w-full text-left p-4 rounded-xl border border-emerald-500 bg-emerald-950/30 text-emerald-300 transition-all text-sm font-semibold flex justify-between items-center";
+                clickedBtn.querySelector('i').className = "fa-solid fa-circle-check text-emerald-500 text-lg";
+                
+                quizFeedback.className = "p-4 rounded-xl border border-emerald-900/30 bg-emerald-950/20 text-xs text-emerald-300 leading-relaxed space-y-1";
+                feedbackTitle.textContent = "✓ ¡Respuesta Correcta!";
+                feedbackDesc.textContent = data.reason;
+            } else {
+                // Incorrecto
+                clickedBtn.className = "w-full text-left p-4 rounded-xl border border-rose-500 bg-rose-950/30 text-rose-300 transition-all text-sm font-semibold flex justify-between items-center";
+                clickedBtn.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-500 text-lg";
+
+                // Mostrar la correcta en verde
+                const correctBtn = allButtons[data.correct];
+                correctBtn.className = "w-full text-left p-4 rounded-xl border border-emerald-500 bg-emerald-950/30 text-emerald-300 transition-all text-sm font-semibold flex justify-between items-center";
+                correctBtn.querySelector('i').className = "fa-solid fa-circle-check text-emerald-500 text-lg";
+
+                quizFeedback.className = "p-4 rounded-xl border border-rose-900/30 bg-rose-950/20 text-xs text-rose-300 leading-relaxed space-y-1";
+                feedbackTitle.textContent = "✗ Respuesta Incorrecta";
+                feedbackDesc.textContent = data.reason;
+            }
+
+            // Actualizar marcador
+            const pct = Math.round((score / quizQuestions.length) * 100);
+            quizScoreLbl.textContent = `Puntuación: ${pct}%`;
+        }
+
+        function nextQuestion() {
+            currentQuizIndex++;
+            if (currentQuizIndex < quizQuestions.length) {
+                loadQuizQuestion();
+            } else {
+                // Fin del juego
+                const finalPct = Math.round((score / quizQuestions.length) * 100);
+                quizQuestionText.textContent = "¡Has completado el examen de comprensión!";
+                quizOptionsContainer.innerHTML = `
+                    <div class="text-center py-6 space-y-4">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                            <i class="fa-solid fa-award text-4xl animate-bounce"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <h5 class="font-bold text-xl text-slate-100">Resultado Final</h5>
+                            <p class="text-xs text-slate-400">Acertaste ${score} de ${quizQuestions.length} preguntas correctamente.</p>
+                        </div>
+                        <p class="text-3xl font-black text-emerald-400">${finalPct}%</p>
+                        <button onclick="restartQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-5 py-3 rounded-xl transition">
+                            Volver a Intentarlo
+                        </button>
+                    </div>
+                `;
+                quizFeedback.classList.add('hidden');
+                quizNextBtn.classList.add('hidden');
+            }
+        }
+
+        function restartQuiz() {
+            currentQuizIndex = 0;
+            score = 0;
+            quizScoreLbl.textContent = "Puntuación: 0%";
+            loadQuizQuestion();
+        }
+
+        // Cargar primera pregunta
+        loadQuizQuestion();
+
+        // --- UTILS ---
+        function scrollToLab() {
+            document.getElementById('laboratorio').scrollIntoView({ behavior: 'smooth' });
+        }
     </script>
 </body>
 </html>
